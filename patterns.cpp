@@ -38,6 +38,18 @@ public:
         }
     }
 
+    void printInvertedRightTriangle()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j <= height - i - 1; j++)
+            {
+                cout << j << " ";
+            }
+            cout << endl;
+        }
+    }
+
     ~Patterns()
     {
         cout << "Destructor called." << endl;
@@ -53,6 +65,9 @@ int main()
 
     cout << "Right Triangle Pattern:" << endl;
     p.printRightTriangle();
+
+    cout << "Inverted Right Triangle Pattern:" << endl;
+    p.printInvertedRightTriangle();
 
     return 0;
 }
