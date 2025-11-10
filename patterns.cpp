@@ -26,6 +26,18 @@ public:
         }
     }
 
+    void printRightTriangle()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j <= i; j++)
+            {
+                cout << j << " ";
+            }
+            cout << endl;
+        }
+    }
+
     ~Patterns()
     {
         cout << "Destructor called." << endl;
@@ -34,8 +46,13 @@ public:
 
 int main()
 {
-    Patterns p(2);
+    Patterns p(4);
+
+    cout << "Square Pattern:" << endl;
     p.printRectangle();
+
+    cout << "Right Triangle Pattern:" << endl;
+    p.printRightTriangle();
 
     return 0;
 }
