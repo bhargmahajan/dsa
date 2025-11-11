@@ -113,7 +113,7 @@ public:
 
 int main()
 {
-    Patterns p(5);
+    Patterns p(4);
 
     cout << "Square Pattern:" << endl;
     p.printRectangle();
