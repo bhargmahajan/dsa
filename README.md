@@ -1,3 +1,3 @@
 # dsa
 
-author=bharg
+author=@bhargmahajan
