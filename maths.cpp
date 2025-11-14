@@ -10,11 +10,14 @@ class maths
 
 public:
     maths(int number);
+
     int countDigits();
     int reverse();
     bool isPalindrome();
     bool isArmstrong();
     int gcd(int a, int b);
+    bool isPrime();
+
     ~maths();
 };
 
@@ -88,6 +91,27 @@ int maths::gcd(int a, int b)
     gcd(max(a, b) % min(a, b), min(a, b));
 }
 
+bool maths::isPrime()
+{
+    int cnt = 2;
+    bool pr = true;
+
+    for (int i = 2; i <= sqrt(number); i++)
+    {
+        if (number % i == 0)
+        {
+            cnt++;
+        }
+    }
+
+    if (cnt > 2)
+    {
+        pr = false;
+    }
+
+    return pr;
+}
+
 maths::~maths()
 {
     cout << "Destructor called" << endl;
@@ -95,7 +119,7 @@ maths::~maths()
 
 int main()
 {
-    maths obj(153);
+    maths obj(107);
 
     cout << "Number of digits: " << obj.countDigits() << endl;
 
@@ -106,6 +130,8 @@ int main()
     cout << "Is Armstrong: " << (obj.isArmstrong() ? "Yes" : "No") << endl;
 
     cout << "GCD: " << obj.gcd(100, 35) << endl;
+
+    cout << "Is Prime: " << (obj.isPrime() ? "Yes" : "No") << endl;
 
     return 0;
 }
