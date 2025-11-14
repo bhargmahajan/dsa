@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <climits>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,7 @@ public:
     bool isArmstrong();
     int gcd(int a, int b);
     bool isPrime();
+    vector<int> divisors();
 
     ~maths();
 };
@@ -112,6 +114,22 @@ bool maths::isPrime()
     return pr;
 }
 
+vector<int> maths::divisors()
+{
+    vector<int> res;
+
+    for (int i = 1; i <= sqrt(number); i++)
+    {
+        if (number % i == 0)
+        {
+            res.push_back(i);
+            res.push_back(number / i);
+        }
+    }
+
+    return res;
+}
+
 maths::~maths()
 {
     cout << "Destructor called" << endl;
@@ -119,7 +137,7 @@ maths::~maths()
 
 int main()
 {
-    maths obj(107);
+    maths obj(40);
 
     cout << "Number of digits: " << obj.countDigits() << endl;
 
@@ -132,6 +150,14 @@ int main()
     cout << "GCD: " << obj.gcd(100, 35) << endl;
 
     cout << "Is Prime: " << (obj.isPrime() ? "Yes" : "No") << endl;
+
+    vector<int> divisors = obj.divisors();
+    cout << "Divisors: ";
+    for (int i = 0; i < divisors.size(); i++)
+    {
+        cout << divisors[i] << " ";
+    }
+    cout << endl;
 
     return 0;
 }
