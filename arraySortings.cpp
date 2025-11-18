@@ -13,10 +13,13 @@ public:
 
     void printArray();
     void swap(int &a, int &b);
+    void split(int arr[], int left, int right);
+    void merge(int arr[], int left, int mid, int right);
 
     void selectionSort();
     void bubbleSort();
     void insertionSort();
+    void mergesort();
 
     ~ArraySortings();
 };
@@ -49,6 +52,51 @@ void ArraySortings::swap(int &a, int &b)
     int temp = a;
     a = b;
     b = temp;
+}
+
+void ArraySortings::split(int arr[], int left, int right)
+{
+    if (left >= right)
+        return;
+
+    int mid = left + (right - left) / 2;
+    split(arr, left, mid);
+    split(arr, mid + 1, right);
+    merge(arr, left, mid, right);
+}
+
+void ArraySortings::merge(int arr[], int left, int mid, int right)
+{
+    int temp[10];
+    int a = left, b = mid + 1;
+    int i = 0;
+
+    while (a <= mid && b <= right)
+    {
+        if (arr[a] <= arr[b])
+        {
+            temp[i++] = arr[a++];
+        }
+        else
+        {
+            temp[i++] = arr[b++];
+        }
+    }
+
+    while (a <= mid)
+    {
+        temp[i++] = arr[a++];
+    }
+
+    while (b <= right)
+    {
+        temp[i++] = arr[b++];
+    }
+
+    for (int i = left; i <= right; i++)
+    {
+        arr[i] = temp[i - left];
+    }
 }
 
 void ArraySortings::selectionSort()
@@ -109,6 +157,12 @@ void ArraySortings::insertionSort()
     printArray();
 }
 
+void ArraySortings::mergesort()
+{
+    split(this->arr, 0, this->n - 1);
+    printArray();
+}
+
 ArraySortings::~ArraySortings()
 {
     cout << "Destructor called." << endl;
@@ -126,6 +180,9 @@ int main()
 
     ArraySortings obj3(arr, 8);
     obj3.insertionSort();
+
+    ArraySortings obj4(arr, 8);
+    obj4.mergesort();
 
     return 0;
 }
