@@ -15,11 +15,14 @@ public:
     void swap(int &a, int &b);
     void split(int arr[], int left, int right);
     void merge(int arr[], int left, int mid, int right);
+    void partition(int arr[], int left, int right);
+    int pivot(int arr[], int left, int right);
 
     void selectionSort();
     void bubbleSort();
     void insertionSort();
     void mergesort();
+    void quickSort();
 
     ~ArraySortings();
 };
@@ -99,6 +102,36 @@ void ArraySortings::merge(int arr[], int left, int mid, int right)
     }
 }
 
+void ArraySortings::partition(int arr[], int left, int right)
+{
+    if (left < right)
+    {
+        int p = pivot(arr, left, right);
+        partition(arr, left, p - 1);
+        partition(arr, p + 1, right);
+    }
+}
+
+int ArraySortings::pivot(int arr[], int left, int right)
+{
+    int p = arr[left], i = left + 1, j = right;
+    while (i < j)
+    {
+        if (arr[i] >= p && arr[j] <= p)
+        {
+            swap(arr[i], arr[j]);
+            i++;
+            j--;
+        }
+        if (arr[i] <= p)
+            i++;
+        if (arr[j] >= p)
+            j--;
+    }
+    swap(arr[left], arr[j]);
+    return j;
+}
+
 void ArraySortings::selectionSort()
 {
     for (int i = 0; i < this->n - 1; i++)
@@ -163,6 +196,12 @@ void ArraySortings::mergesort()
     printArray();
 }
 
+void ArraySortings::quickSort()
+{
+    partition(this->arr, 0, this->n - 1);
+    printArray();
+}
+
 ArraySortings::~ArraySortings()
 {
     cout << "Destructor called." << endl;
@@ -172,7 +211,7 @@ int main()
 {
     int arr[10] = {23, -23, 32, -1, -1, 5, 62, 5};
 
-    ArraySortings obj1(arr, 10);
+    ArraySortings obj1(arr, 8);
     obj1.selectionSort();
 
     ArraySortings obj2(arr, 8);
@@ -183,6 +222,9 @@ int main()
 
     ArraySortings obj4(arr, 8);
     obj4.mergesort();
+
+    ArraySortings obj5(arr, 8);
+    obj5.quickSort();
 
     return 0;
 }
