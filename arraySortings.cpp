@@ -41,9 +41,13 @@ ArraySortings::ArraySortings(int arr[10], int n)
 
 void ArraySortings::printArray()
 {
+    if (this->n <= 0)
+    {
+        cout << "Array is empty." << endl;
+        return;
+    }
     cout << "Array is:" << endl;
-
-    for (int i = 0; i < this->n; i++)
+    for (int i = 0; i <= this->n; i++)
     {
         cout << this->arr[i] << " ";
     }
