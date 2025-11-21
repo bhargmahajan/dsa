@@ -8,12 +8,12 @@
 
 using namespace std;
 
+/*
+    @author: Bharg Mahajan
+    @description: This class contains various array problems solutions implemented in C++.
+*/
 class ArrayProblems
 {
-    /*
-        @author: Bharg Mahajan
-        @description: This class contains various array problems solutions implemented in C++.
-    */
     int arr[10] = {0};
     int n = 0;
 
@@ -21,6 +21,8 @@ public:
     ArrayProblems(int arr[10], int n);
 
     void printArray(int n);
+    void reverseArray(int left, int right);
+    void swap(int &a, int &b);
 
     /*
         Function to find the maximum element in the array
@@ -52,6 +54,18 @@ public:
         Space Complexity: O(n)
     */
     void removeDuplicatesUnsortedArray();
+    /*
+        Function to left rotate the array by one position
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    void rotateByOnePlace();
+    /*
+        Function to left rotate the array by k position
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    void rotateByKPlace(int k);
 
     ~ArrayProblems();
 };
@@ -68,6 +82,23 @@ ArrayProblems::ArrayProblems(int arr[10], int n)
     cout << "Constructor called." << endl;
 }
 
+void ArrayProblems::swap(int &a, int &b)
+{
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+void ArrayProblems::reverseArray(int left, int right)
+{
+    while (left <= right)
+    {
+        swap(this->arr[left], this->arr[right]);
+        left++;
+        right--;
+    }
+}
+
 void ArrayProblems::printArray(int n = 10)
 {
     if (n <= 0)
@@ -77,7 +108,7 @@ void ArrayProblems::printArray(int n = 10)
     }
 
     cout << "Array is:" << endl;
-    for (int i = 0; i <= n; i++)
+    for (int i = 0; i < n; i++)
     {
         cout << this->arr[i] << " ";
     }
@@ -153,14 +184,14 @@ void ArrayProblems::removeDuplicatesSortedArray()
         }
         j++;
     }
-    printArray(i);
+    printArray(i + 1);
 }
 
 void ArrayProblems::removeDuplicatesUnsortedArray()
 {
     if (n < 2)
     {
-        printArray(n - 1);
+        printArray(n);
         return;
     }
 
@@ -177,7 +208,43 @@ void ArrayProblems::removeDuplicatesUnsortedArray()
         i++;
     }
 
-    printArray(i - 1);
+    printArray(i);
+}
+
+void ArrayProblems::rotateByOnePlace()
+{
+    if (n < 2)
+    {
+        printArray(n);
+        return;
+    }
+
+    int first = this->arr[0];
+    for (int i = 0; i < n; i++)
+    {
+        this->arr[i] = this->arr[i + 1];
+    }
+
+    this->arr[n - 1] = first;
+
+    printArray(n);
+}
+
+void ArrayProblems::rotateByKPlace(int k)
+{
+    if (n < 2)
+    {
+        printArray(this->n);
+        return;
+    }
+
+    k = k % this->n;
+
+    reverseArray(0, k - 1);
+    reverseArray(k, this->n - 1);
+    reverseArray(0, this->n - 1);
+
+    printArray(this->n);
 }
 
 ArrayProblems::~ArrayProblems()
@@ -188,7 +255,7 @@ ArrayProblems::~ArrayProblems()
 int main()
 {
     int arr[10] = {1000, -726, 5550, 6200, -726, 5550};
-    int n = 0;
+    int n = 7;
 
     ArrayProblems obj1(arr, n);
     cout << "Maximum element is: " << obj1.findMax() << endl;
@@ -202,6 +269,8 @@ int main()
 
     obj1.removeDuplicatesSortedArray();
     obj1.removeDuplicatesUnsortedArray();
+    obj1.rotateByOnePlace();
+    obj1.rotateByKPlace(9);
 
     return 0;
 }
