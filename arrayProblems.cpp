@@ -66,6 +66,12 @@ public:
         Space Complexity: O(1)
     */
     void rotateByKPlace(int k);
+    /*
+        Function to move zeros to the end
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    void moveZeros();
 
     ~ArrayProblems();
 };
@@ -247,6 +253,34 @@ void ArrayProblems::rotateByKPlace(int k)
     printArray(this->n);
 }
 
+void ArrayProblems::moveZeros()
+{
+    if (n == 0)
+        return;
+
+    if (n == 1)
+    {
+        printArray(this->n);
+        return;
+    }
+
+    int i = 0, j = 1;
+    while (j < this->n)
+    {
+        if (this->arr[i] == 0 && this->arr[j] != 0)
+        {
+            swap(this->arr[i], this->arr[j]);
+            i++;
+        }
+
+        if (this->arr[i] != 0)
+            i++;
+        j++;
+    }
+
+    printArray(this->n);
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -255,22 +289,24 @@ ArrayProblems::~ArrayProblems()
 int main()
 {
     int arr[10] = {1000, -726, 5550, 6200, -726, 5550};
-    int n = 7;
+    int n = 5;
 
     ArrayProblems obj1(arr, n);
-    cout << "Maximum element is: " << obj1.findMax() << endl;
-    cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
+    // cout << "Maximum element is: " << obj1.findMax() << endl;
+    // cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
 
-    bool sorted = obj1.checkIfSorted();
-    if (sorted)
-        cout << "The array is sorted." << endl;
-    else
-        cout << "The array is not sorted." << endl;
+    // bool sorted = obj1.checkIfSorted();
+    // if (sorted)
+    //     cout << "The array is sorted." << endl;
+    // else
+    //     cout << "The array is not sorted." << endl;
 
-    obj1.removeDuplicatesSortedArray();
-    obj1.removeDuplicatesUnsortedArray();
-    obj1.rotateByOnePlace();
-    obj1.rotateByKPlace(9);
+    // obj1.removeDuplicatesSortedArray();
+    // obj1.removeDuplicatesUnsortedArray();
+    // obj1.rotateByOnePlace();
+    // obj1.rotateByKPlace(9);
+
+    obj1.moveZeros();
 
     return 0;
 }
