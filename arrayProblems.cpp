@@ -292,19 +292,19 @@ int main()
     int n = 5;
 
     ArrayProblems obj1(arr, n);
-    // cout << "Maximum element is: " << obj1.findMax() << endl;
-    // cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
+    cout << "Maximum element is: " << obj1.findMax() << endl;
+    cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
 
-    // bool sorted = obj1.checkIfSorted();
-    // if (sorted)
-    //     cout << "The array is sorted." << endl;
-    // else
-    //     cout << "The array is not sorted." << endl;
+    bool sorted = obj1.checkIfSorted();
+    if (sorted)
+        cout << "The array is sorted." << endl;
+    else
+        cout << "The array is not sorted." << endl;
 
-    // obj1.removeDuplicatesSortedArray();
-    // obj1.removeDuplicatesUnsortedArray();
-    // obj1.rotateByOnePlace();
-    // obj1.rotateByKPlace(9);
+    obj1.removeDuplicatesSortedArray();
+    obj1.removeDuplicatesUnsortedArray();
+    obj1.rotateByOnePlace();
+    obj1.rotateByKPlace(9);
 
     obj1.moveZeros();
 
