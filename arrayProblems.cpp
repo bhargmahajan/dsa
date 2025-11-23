@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -15,10 +16,11 @@ using namespace std;
 class ArrayProblems
 {
     int arr[10] = {0};
-    int n = 0;
+    int n = 0, n2 = 0;
+    int arr2[10] = {0};
 
 public:
-    ArrayProblems(int arr[10], int n);
+    ArrayProblems(int arr[10], int n, int arr2[10], int n2);
 
     void printArray(int n);
     void reverseArray(int left, int right);
@@ -72,17 +74,29 @@ public:
         Space Complexity: O(1)
     */
     void moveZeros();
+    /*
+        Function to move zeros to the end
+        Time Complexity: O(m+n)
+        Space Complexity: O(m+n)
+    */
+    void unionSortedArray();
 
     ~ArrayProblems();
 };
 
-ArrayProblems::ArrayProblems(int arr[10], int n)
+ArrayProblems::ArrayProblems(int arr[10], int n, int arr2[10], int n2)
 {
     this->n = n;
+    this->n2 = n2;
 
     for (int i = 0; i < this->n; i++)
     {
         this->arr[i] = arr[i];
+    }
+
+    for (int i = 0; i < this->n2; i++)
+    {
+        this->arr2[i] = arr2[i];
     }
 
     cout << "Constructor called." << endl;
@@ -281,6 +295,46 @@ void ArrayProblems::moveZeros()
     printArray(this->n);
 }
 
+void ArrayProblems::unionSortedArray()
+{
+    int i = 0, j = 0;
+    vector<int> Union;
+
+    while (i < this->n && j < this->n2)
+    {
+        if (this->arr[i] <= this->arr2[j])
+        {
+            if (Union.size() == 0 || Union.back() != this->arr[i])
+                Union.push_back(this->arr[i]);
+            i++;
+        }
+        else
+        {
+            if (Union.size() == 0 || Union.back() != this->arr2[j])
+                Union.push_back(this->arr2[j]);
+            j++;
+        }
+    }
+    while (i < this->n)
+    {
+        if (Union.back() != this->arr[i])
+            Union.push_back(this->arr[i]);
+        i++;
+    }
+    while (j < this->n2)
+    {
+        if (Union.back() != this->arr2[j])
+            Union.push_back(this->arr2[j]);
+        j++;
+    }
+
+    for (int i = 0; i < Union.size(); i++)
+    {
+        cout << Union[i] << " ";
+    }
+    cout << endl;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -288,10 +342,13 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {1000, -726, 5550, 6200, -726, 5550};
-    int n = 5;
+    int arr[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    int n = 10;
 
-    ArrayProblems obj1(arr, n);
+    int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
+    int n2 = 7;
+
+    ArrayProblems obj1(arr, n, arr2, n2);
     cout << "Maximum element is: " << obj1.findMax() << endl;
     cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
 
@@ -305,8 +362,8 @@ int main()
     obj1.removeDuplicatesUnsortedArray();
     obj1.rotateByOnePlace();
     obj1.rotateByKPlace(9);
-
     obj1.moveZeros();
+    obj1.unionSortedArray();
 
     return 0;
 }
