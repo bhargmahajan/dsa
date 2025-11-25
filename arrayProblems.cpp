@@ -30,6 +30,7 @@ public:
         Function to find the maximum element in the array
         Time Complexity: O(n)
         Space Complexity: O(1)
+        Line Number: 169
     */
     int findMax();
     /*
@@ -80,6 +81,30 @@ public:
         Space Complexity: O(m+n)
     */
     void unionSortedArray();
+    /*
+        Function to find the missing number
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int missingNumberInUnsortedArray();
+    /*
+        Function to find the missing number
+        Time Complexity: O(n), O(1) for best case
+        Space Complexity: O(1)
+    */
+    int missingNumberInSortedArray();
+    /*
+        Function to find the missing number
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int consecutiveOnes();
+    /*
+        Function to find the single number
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int singleElement();
 
     ~ArrayProblems();
 };
@@ -90,14 +115,10 @@ ArrayProblems::ArrayProblems(int arr[10], int n, int arr2[10], int n2)
     this->n2 = n2;
 
     for (int i = 0; i < this->n; i++)
-    {
         this->arr[i] = arr[i];
-    }
 
     for (int i = 0; i < this->n2; i++)
-    {
         this->arr2[i] = arr2[i];
-    }
 
     cout << "Constructor called." << endl;
 }
@@ -129,9 +150,7 @@ void ArrayProblems::printArray(int n = 10)
 
     cout << "Array is:" << endl;
     for (int i = 0; i < n; i++)
-    {
         cout << this->arr[i] << " ";
-    }
     cout << endl;
 }
 
@@ -217,9 +236,7 @@ void ArrayProblems::removeDuplicatesUnsortedArray()
 
     unordered_map<int, bool> uniques;
     for (int j = 0; j < n; j++)
-    {
         uniques[this->arr[j]]++;
-    }
 
     int i = 0;
     for (auto it : uniques)
@@ -241,9 +258,7 @@ void ArrayProblems::rotateByOnePlace()
 
     int first = this->arr[0];
     for (int i = 0; i < n; i++)
-    {
         this->arr[i] = this->arr[i + 1];
-    }
 
     this->arr[n - 1] = first;
 
@@ -329,10 +344,51 @@ void ArrayProblems::unionSortedArray()
     }
 
     for (int i = 0; i < Union.size(); i++)
-    {
         cout << Union[i] << " ";
-    }
     cout << endl;
+}
+
+int ArrayProblems::missingNumberInUnsortedArray()
+{
+    int sum = 0;
+
+    for (int i = 0; i < this->n; i++)
+        sum += this->arr[i];
+    int totalSum = (this->n * (this->n + 1)) / 2;
+    return totalSum - sum;
+}
+
+int ArrayProblems::missingNumberInSortedArray()
+{
+    for (int i = 1; i <= this->n; i++)
+    {
+        if (i != this->arr[i - 1])
+            return i;
+    }
+
+    return -1;
+}
+
+int ArrayProblems::consecutiveOnes()
+{
+    int count = 0, maxCount = 0;
+    for (int i = 0; i < this->n; i++)
+    {
+        if (this->arr[i] == 0)
+            count = 0;
+        else
+            count++;
+        maxCount = max(maxCount, count);
+    }
+    return maxCount;
+}
+
+int ArrayProblems::singleElement()
+{
+    int xr = 0;
+    for (int i = 0; i <= this->n; i++)
+        xr ^= this->arr[i];
+    return xr;
 }
 
 ArrayProblems::~ArrayProblems()
@@ -342,16 +398,16 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int n = 10;
+    int arr[10] = {1, 3, 0, 0, 2, 2, 3};
+    int n = 7;
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
     ArrayProblems obj1(arr, n, arr2, n2);
+
     cout << "Maximum element is: " << obj1.findMax() << endl;
     cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
-
     bool sorted = obj1.checkIfSorted();
     if (sorted)
         cout << "The array is sorted." << endl;
@@ -364,6 +420,10 @@ int main()
     obj1.rotateByKPlace(9);
     obj1.moveZeros();
     obj1.unionSortedArray();
+    cout << "Missing element in sorted array is: " << obj1.missingNumberInSortedArray() << endl;
+    cout << "Missing element in unsorted array is: " << obj1.missingNumberInUnsortedArray() << endl;
+    cout << "Maximum number of consecutive ones is: " << obj1.consecutiveOnes() << endl;
+    cout << "Single element is: " << obj1.singleElement() << endl;
 
     return 0;
 }
