@@ -6,6 +6,8 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
+#include <map>
 
 using namespace std;
 
@@ -105,6 +107,18 @@ public:
         Space Complexity: O(1)
     */
     int singleElement();
+    /*
+        Function to find longest subarray with sum k
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int longestSubarrayWithKSum(int k);
+    /*
+        Function to find the indices with target sum
+        Time Complexity: O(n+(n*log n))
+        Space Complexity: O(n)
+    */
+    pair<int, int> targetSum(int k);
 
     ~ArrayProblems();
 };
@@ -391,6 +405,55 @@ int ArrayProblems::singleElement()
     return xr;
 }
 
+int ArrayProblems::longestSubarrayWithKSum(int k)
+{
+    if (this->n == 0)
+        return 0;
+
+    int i = 0, j = 1, sum = this->arr[0], res = 0;
+    while (j <= this->n)
+    {
+        if (sum == k)
+            res = max(res, j - i);
+
+        if (sum > k)
+        {
+            sum -= this->arr[i];
+            i++;
+            if (sum == k)
+                res = max(res, j - i);
+        }
+
+        sum += this->arr[j];
+        j++;
+    }
+
+    return res;
+}
+
+pair<int, int> ArrayProblems::targetSum(int k)
+{
+    pair<int, int> res = {-1, -1};
+    vector<pair<int, int>> numMap;
+    for (int i = 0; i < this->n; i++)
+        numMap.push_back({this->arr[i], i});
+
+    sort(numMap.begin(), numMap.end());
+
+    int i = 0, j = this->n - 1;
+    while (i < j)
+    {
+        if (numMap[i].first + numMap[j].first == k)
+            return {numMap[i].second, numMap[j].second};
+        else if (numMap[i].first + numMap[j].first > k)
+            j--;
+        else if (numMap[i].first + numMap[j].first < k)
+            i++;
+    }
+
+    return {-1, -1};
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -398,32 +461,34 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {1, 3, 0, 0, 2, 2, 3};
-    int n = 7;
+    int arr[10] = {3, 3};
+    int n = 2;
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
     ArrayProblems obj1(arr, n, arr2, n2);
 
-    cout << "Maximum element is: " << obj1.findMax() << endl;
-    cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
-    bool sorted = obj1.checkIfSorted();
-    if (sorted)
-        cout << "The array is sorted." << endl;
-    else
-        cout << "The array is not sorted." << endl;
+    // cout << "Maximum element is: " << obj1.findMax() << endl;
+    // cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
+    // bool sorted = obj1.checkIfSorted();
+    // if (sorted)
+    //     cout << "The array is sorted." << endl;
+    // else
+    //     cout << "The array is not sorted." << endl;
 
-    obj1.removeDuplicatesSortedArray();
-    obj1.removeDuplicatesUnsortedArray();
-    obj1.rotateByOnePlace();
-    obj1.rotateByKPlace(9);
-    obj1.moveZeros();
-    obj1.unionSortedArray();
-    cout << "Missing element in sorted array is: " << obj1.missingNumberInSortedArray() << endl;
-    cout << "Missing element in unsorted array is: " << obj1.missingNumberInUnsortedArray() << endl;
-    cout << "Maximum number of consecutive ones is: " << obj1.consecutiveOnes() << endl;
-    cout << "Single element is: " << obj1.singleElement() << endl;
+    // obj1.removeDuplicatesSortedArray();
+    // obj1.removeDuplicatesUnsortedArray();
+    // obj1.rotateByOnePlace();
+    // obj1.rotateByKPlace(9);
+    // obj1.moveZeros();
+    // obj1.unionSortedArray();
+    // cout << "Missing element in sorted array is: " << obj1.missingNumberInSortedArray() << endl;
+    // cout << "Missing element in unsorted array is: " << obj1.missingNumberInUnsortedArray() << endl;
+    // cout << "Maximum number of consecutive ones is: " << obj1.consecutiveOnes() << endl;
+    // cout << "Single element is: " << obj1.singleElement() << endl;
+    // cout << "Lenght of longest subarray: " << obj1.longestSubarrayWithKSum(5) << endl;
+    cout << "Indices of elements whose sum is: " << obj1.targetSum(6).first << ", " << obj1.targetSum(6).second << endl;
 
     return 0;
 }
