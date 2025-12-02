@@ -8,6 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <climits>
 
 using namespace std;
 
@@ -119,6 +120,30 @@ public:
         Space Complexity: O(n)
     */
     pair<int, int> targetSum(int k);
+    /*
+        Function to sort an array of 0s, 1s and 2s
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    void sortOnesTwosAndZeroes();
+    /*
+        Function to find majority element in an array
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int majorityElement();
+    /*
+    Function to find majority element in an array
+    Time Complexity: O(n)
+    Space Complexity: O(1)
+    */
+    int maxSumForSubarray();
+    /*
+    Function to find maximum profit from stock prices
+    Time Complexity: O(n)
+    Space Complexity: O(1)
+    */
+    int maxProfit();
 
     ~ArrayProblems();
 };
@@ -454,6 +479,107 @@ pair<int, int> ArrayProblems::targetSum(int k)
     return {-1, -1};
 }
 
+void ArrayProblems::sortOnesTwosAndZeroes()
+{
+    if (this->n == 0)
+        return;
+
+    if (this->n == 1)
+    {
+        printArray(this->n);
+        return;
+    }
+
+    int low = 0, mid = 0, high = this->n - 1;
+    while (mid <= high)
+    {
+        if (this->arr[mid] == 0)
+        {
+            swap(this->arr[low], this->arr[mid]);
+            low++;
+            mid++;
+        }
+        else if (this->arr[mid] == 1)
+        {
+            mid++;
+        }
+        else if (this->arr[mid] == 2)
+        {
+            swap(this->arr[mid], this->arr[high]);
+            high--;
+        }
+    }
+
+    for (int i = 0; i < this->n; i++)
+        cout << this->arr[i] << " ";
+    cout << endl;
+}
+
+int ArrayProblems::majorityElement()
+{
+
+    if (this->n < 2)
+        return -1;
+
+    int count = 0, ele;
+    for (int i = 0; i < this->n; i++)
+    {
+        if (count == 0)
+        {
+            ele = this->arr[i];
+            count = 1;
+        }
+        else if (ele == this->arr[i])
+            count++;
+        else
+            count--;
+    }
+    return ele;
+}
+
+int ArrayProblems::maxSumForSubarray()
+{
+    if (this->n == 0)
+        return 0;
+    if (this->n == 1)
+        return this->arr[0];
+
+    int maxSum = INT_MIN, sum = 0, i = 0, start = -1, end = -1;
+    for (int k = 0; k < this->n; k++)
+    {
+        if (sum == 0)
+            i = k;
+        sum += this->arr[k];
+        if (sum > maxSum)
+        {
+            maxSum = sum;
+            start = i;
+            end = k;
+        }
+        if (sum < 0)
+            sum = 0;
+    }
+
+    for (int k = start; k <= end; k++)
+        cout << this->arr[k] << " ";
+    cout << endl;
+
+    return maxSum;
+}
+
+int ArrayProblems::maxProfit()
+{
+    int minPrice = INT_MAX, maxProfit = 0;
+    for (int i = 0; i < this->n; i++)
+    {
+        if (this->arr[i] < minPrice)
+            minPrice = this->arr[i];
+        else
+            maxProfit = max(maxProfit, this->arr[i] - minPrice);
+    }
+    return maxProfit;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -461,8 +587,8 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {3, 3};
-    int n = 2;
+    int arr[10] = {7, 1, 5, 3, 6, 4};
+    int n = 6;
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
@@ -488,7 +614,11 @@ int main()
     // cout << "Maximum number of consecutive ones is: " << obj1.consecutiveOnes() << endl;
     // cout << "Single element is: " << obj1.singleElement() << endl;
     // cout << "Lenght of longest subarray: " << obj1.longestSubarrayWithKSum(5) << endl;
-    cout << "Indices of elements whose sum is: " << obj1.targetSum(6).first << ", " << obj1.targetSum(6).second << endl;
+    // cout << "Indices of elements whose sum is: " << obj1.targetSum(6).first << ", " << obj1.targetSum(6).second << endl;
+    // obj1.sortOnesTwosAndZeroes();
+    // cout << "Majority element: " << obj1.majorityElement() << endl;
+    cout << "Maximum sum for subarray: " << obj1.maxSumForSubarray() << endl;
+    cout << "Maximum profit from stock prices: " << obj1.maxProfit() << endl;
 
     return 0;
 }
