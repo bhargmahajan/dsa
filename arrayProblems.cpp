@@ -133,19 +133,43 @@ public:
     */
     int majorityElement();
     /*
-    Function to find majority element in an array
-    Time Complexity: O(n)
-    Space Complexity: O(1)
+        Function to find majority element in an array
+        Time Complexity: O(n)
+        Space Complexity: O(1)
     */
     int maxSumForSubarray();
     /*
-    Function to find maximum profit from stock prices
-    Time Complexity: O(n)
-    Space Complexity: O(1)
+        Function to find maximum profit from stock prices
+        Time Complexity: O(n)
+        Space Complexity: O(1)
     */
     int maxProfit();
+    /*
+        Function to rearrange the array in alternate positive and negative items
+        Time Complexity: O(n)
+        Space Complexity: O(n)
+    */
+    void alternativePosNeg();
+    /*
+        Function to find the next permutation of the array
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    void nextPermutation(vector<int> &nums);
+    /*
+        Function to find the leaders in an array
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    vector<int> leaders(vector<int> &nums);
+    /*
+        Function to add 0s in matrix rows and columns
+        Time Complexity: O(m*n)
+        Space Complexity: O(1)
+    */
+    void setZeroes(vector<vector<int>> &matrix);
 
-    ~ArrayProblems();
+        ~ArrayProblems();
 };
 
 ArrayProblems::ArrayProblems(int arr[10], int n, int arr2[10], int n2)
@@ -580,6 +604,142 @@ int ArrayProblems::maxProfit()
     return maxProfit;
 }
 
+void ArrayProblems::alternativePosNeg()
+{
+    int j = 0, k = 1;
+    vector<int> res(this->n);
+
+    for (int i = 0; i < this->n; i++)
+    {
+        if (this->arr[i] > 0)
+        {
+            res[j] = this->arr[i];
+            j += 2;
+        }
+        else
+        {
+            res[k] = this->arr[i];
+            k += 2;
+        }
+    }
+
+    for (int i = 0; i < this->n; i++)
+        cout << res[i] << " ";
+    cout << endl;
+}
+
+void ArrayProblems::nextPermutation(vector<int> &nums)
+{
+    int j = nums.size() - 2;
+    while (j >= 0)
+    {
+        if (nums[j + 1] > nums[j])
+            break;
+        j--;
+    }
+
+    if (j == -1)
+    {
+        reverse(nums.begin(), nums.end());
+        return;
+    }
+
+    for (int i = nums.size() - 1; i > j; i--)
+    {
+        if (nums[i] > nums[j])
+        {
+            swap(nums[i], nums[j]);
+            break;
+        }
+    }
+
+    reverse(nums.begin() + j + 1, nums.end());
+
+    for (int i = 0; i < nums.size(); i++)
+        cout << nums[i] << " ";
+    cout << endl;
+}
+
+vector<int> ArrayProblems::leaders(vector<int> &nums)
+{
+    vector<int> result;
+    if (nums.empty())
+        return result;
+
+    int maxEle = nums[nums.size() - 1];
+    result.push_back(maxEle);
+
+    for (int i = nums.size() - 2; i >= 0; i--)
+    {
+        if (nums[i] > maxEle)
+        {
+            maxEle = nums[i];
+            result.push_back(maxEle);
+        }
+    }
+
+    reverse(result.begin(), result.end());
+
+    return result;
+}
+
+void ArrayProblems::setZeroes(vector<vector<int>> &matrix)
+{
+    bool row = false, col = false;
+    int m = matrix.size(), n = matrix[0].size();
+
+    for (int i = 0; i < m; i++)
+    {
+        if (matrix[i][0] == 0)
+        {
+            col = true;
+            break;
+        }
+    }
+
+    for (int i = 0; i < n; i++)
+    {
+        if (matrix[0][i] == 0)
+        {
+            row = true;
+            break;
+        }
+    }
+
+    for (int i = 1; i < m; i++)
+    {
+        for (int j = 1; j < n; j++)
+        {
+            if (matrix[i][j] == 0)
+            {
+                matrix[0][j] = 0;
+                matrix[i][0] = 0;
+            }
+        }
+    }
+
+    for (int i = 1; i < m; i++)
+    {
+        for (int j = 1; j < n; j++)
+        {
+            if (matrix[0][j] == 0 || matrix[i][0] == 0)
+                matrix[i][j] = 0;
+        }
+    }
+
+    if (row == true)
+    {
+        for (int i = 0; i < n; i++)
+            matrix[0][i] = 0;
+    }
+
+    if (col == true)
+    {
+        for (int i = 0; i < m; i++)
+            matrix[i][0] = 0;
+    }
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -587,7 +747,7 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {7, 1, 5, 3, 6, 4};
+    int arr[10] = {3, 1, -2, -5, 2, -4};
     int n = 6;
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
@@ -617,8 +777,29 @@ int main()
     // cout << "Indices of elements whose sum is: " << obj1.targetSum(6).first << ", " << obj1.targetSum(6).second << endl;
     // obj1.sortOnesTwosAndZeroes();
     // cout << "Majority element: " << obj1.majorityElement() << endl;
-    cout << "Maximum sum for subarray: " << obj1.maxSumForSubarray() << endl;
-    cout << "Maximum profit from stock prices: " << obj1.maxProfit() << endl;
+    // cout << "Maximum sum for subarray: " << obj1.maxSumForSubarray() << endl;
+    // cout << "Maximum profit from stock prices: " << obj1.maxProfit() << endl;
+    // cout << "Array rearranged in alternate positive and negative items: "<<endl;
+    // obj1.alternativePosNeg();
+    // vector<int> nums = {4, 7, 1, 0};
+    // // obj1.nextPermutation(nums);
+
+    // vector<int> leaders = obj1.leaders(nums);
+    // cout << "Leaders in the array are: ";
+    // for (int i = 0; i < leaders.size(); i++)
+    //     cout << leaders[i] << " ";
+    // cout << endl;
+
+    vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
+    obj1.setZeroes(matrix);
+    for (auto row : matrix)
+    {
+        for (auto val : row)
+        {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
 
     return 0;
 }
