@@ -9,6 +9,9 @@
 #include <algorithm>
 #include <map>
 #include <climits>
+#include <set>
+#include <utility>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -168,8 +171,26 @@ public:
         Space Complexity: O(1)
     */
     void setZeroes(vector<vector<int>> &matrix);
+    /*
+        Function to find the length of longest consecutive elements sequence
+        Time Complexity: O(n)
+        Space Complexity: O(n)
+    */
+    int longestConsecutive(vector<int> &nums);
+    /*
+        Function to rotate an array by 90 degrees clockwise
+        Time Complexity: O(n^2)
+        Space Complexity: O(1)
+    */
+    void rotateByNinty(vector<vector<int>> &matrix);
+    /*
+        Function to print the elements of the matrix in spiral order
+        Time Complexity: O(m*n)
+        Space Complexity: O(1)
+    */
+    vector<int> spiralOrder(vector<vector<int>> &matrix);
 
-        ~ArrayProblems();
+    ~ArrayProblems();
 };
 
 ArrayProblems::ArrayProblems(int arr[10], int n, int arr2[10], int n2)
@@ -740,6 +761,78 @@ void ArrayProblems::setZeroes(vector<vector<int>> &matrix)
     }
 }
 
+int ArrayProblems::longestConsecutive(vector<int> &nums)
+{
+    if (nums.size() == 0)
+        return 0;
+
+    unordered_set<int> temp;
+    for (int i = 0; i < nums.size(); i++)
+        temp.insert(nums[i]);
+
+    int maxi = 1;
+    for (auto itr : nums)
+    {
+        if (temp.find(itr - 1) == temp.end())
+        {
+            int count = 1;
+            int x = itr;
+            while (temp.find(x + 1) != temp.end())
+            {
+                x++;
+                count++;
+            }
+            maxi = max(maxi, count);
+        }
+    }
+    return maxi;
+}
+
+void ArrayProblems::rotateByNinty(vector<vector<int>> &matrix)
+{
+    int n = matrix.size();
+
+    for (int i = 0; i < n; i++)
+    {
+        for (int j = i + 1; j < n; j++)
+            swap(matrix[i][j], matrix[j][i]);
+    }
+    for (int i = 0; i < n; i++)
+        reverse(matrix[i].begin(), matrix[i].end());
+}
+
+vector<int> ArrayProblems::spiralOrder(vector<vector<int>> &matrix)
+{
+    int top = 0, left = 0, bottom = matrix.size() - 1, right = matrix[0].size() - 1;
+    vector<int> res;
+
+    while (top <= bottom && left <= right)
+    {
+        for (int i = left; i <= right; i++)
+            res.push_back(matrix[top][i]);
+        top++;
+
+        for (int i = top; i <= bottom; i++)
+            res.push_back(matrix[i][right]);
+        right--;
+
+        if (top <= bottom)
+        {
+            for (int i = right; i >= left; i--)
+                res.push_back(matrix[bottom][i]);
+            bottom--;
+        }
+
+        if (left <= right)
+        {
+            for (int i = bottom; i >= top; i--)
+                res.push_back(matrix[i][left]);
+            left++;
+        }
+    }
+    return res;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -752,6 +845,9 @@ int main()
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
+
+    vector<int> nums = {4, 7, 1, 0};
+    vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
 
     ArrayProblems obj1(arr, n, arr2, n2);
 
@@ -781,25 +877,35 @@ int main()
     // cout << "Maximum profit from stock prices: " << obj1.maxProfit() << endl;
     // cout << "Array rearranged in alternate positive and negative items: "<<endl;
     // obj1.alternativePosNeg();
-    // vector<int> nums = {4, 7, 1, 0};
     // // obj1.nextPermutation(nums);
-
     // vector<int> leaders = obj1.leaders(nums);
     // cout << "Leaders in the array are: ";
     // for (int i = 0; i < leaders.size(); i++)
     //     cout << leaders[i] << " ";
     // cout << endl;
-
-    vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
-    obj1.setZeroes(matrix);
-    for (auto row : matrix)
-    {
-        for (auto val : row)
-        {
-            cout << val << " ";
-        }
-        cout << endl;
-    }
+    // obj1.setZeroes(matrix);
+    // for (auto row : matrix)
+    // {
+    //     for (auto val : row)
+    //     {
+    //         cout << val << " ";
+    //     }
+    //     cout << endl;
+    // }
+    // cout << "Length of longest consecutive elements sequence is: " << obj1.longestConsecutive(nums) << endl;
+    // cout << "Matrix after rotating by 90 degrees clockwise:" << endl;
+    // obj1.rotateByNinty(matrix);
+    // for (auto row : matrix)
+    // {
+    //     for (auto val : row)
+    //         cout << val << " ";
+    //     cout << endl;
+    // }
+    // cout << "Spiral order of the matrix is: ";
+    // vector<int> spiral = obj1.spiralOrder(matrix);
+    // for (auto val : spiral)
+    //     cout << val << " ";
+    // cout << endl;
 
     return 0;
 }
