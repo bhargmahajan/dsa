@@ -189,6 +189,30 @@ public:
         Space Complexity: O(1)
     */
     vector<int> spiralOrder(vector<vector<int>> &matrix);
+    /*
+        Function to find the total number of subarrays with sum equal to k
+        Time Complexity: O(n)
+        Space Complexity: O(n)
+    */
+    int subarraySum(vector<int> &nums, int k);
+    /*
+        Function to generate Pascal's Triangle
+        Time Complexity: O(n^2)
+        Space Complexity: O(n)
+    */
+    vector<vector<int>> pascalTriangle(int numRows);
+    /*
+        Function to find majority elements in an array (appearing more than n/3 times)
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    vector<int> majorityElement(vector<int> &nums);
+    /*
+        Function to find all unique triplets in the array which gives the sum of zero
+        Time Complexity: O(n*log n + n^2)
+        Space Complexity: O(1)
+    */
+    vector<vector<int>> threeSum(vector<int> &nums);
 
     ~ArrayProblems();
 };
@@ -833,6 +857,122 @@ vector<int> ArrayProblems::spiralOrder(vector<vector<int>> &matrix)
     return res;
 }
 
+int ArrayProblems::subarraySum(vector<int> &nums, int k)
+{
+    int total = 0, sum = 0;
+    unordered_map<int, int> mp;
+    mp[0] = 1;
+
+    for (int i = 0; i < nums.size(); i++)
+    {
+        sum += nums[i];
+        int rem = sum - k;
+        total += mp[rem];
+        mp[sum]++;
+    }
+
+    return total;
+}
+
+vector<vector<int>> ArrayProblems::pascalTriangle(int numRows)
+{
+    vector<vector<int>> res;
+    for (int i = 1; i <= numRows; i++)
+    {
+        vector<int> temp;
+        temp.push_back(1);
+
+        int x = 1;
+        for (int j = 1; j < i; j++)
+        {
+            x = (x * (i - j)) / j;
+            temp.push_back(x);
+        }
+        res.push_back(temp);
+    }
+
+    return res;
+}
+
+vector<int> ArrayProblems::majorityElement(vector<int> &nums)
+{
+    int n = nums.size() / 3, el1 = 0, el2 = 0, cnt1 = 0, cnt2 = 0;
+    vector<int> res;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        if (cnt1 == 0 && nums[i] != el2)
+        {
+            el1 = nums[i];
+            cnt1++;
+        }
+        else if (cnt2 == 0 && nums[i] != el1)
+        {
+            el2 = nums[i];
+            cnt2++;
+        }
+        else if (el1 == nums[i])
+            cnt1++;
+        else if (el2 == nums[i])
+            cnt2++;
+        else
+        {
+            cnt1--;
+            cnt2--;
+        }
+    }
+
+    cnt1 = 0;
+    cnt2 = 0;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        if (el1 == nums[i])
+            cnt1++;
+        if (el2 == nums[i])
+            cnt2++;
+    }
+
+    if (cnt1 > n)
+        res.push_back(el1);
+    if (cnt2 > n && el1 != el2)
+        res.push_back(el2);
+
+    return res;
+}
+
+vector<vector<int>> ArrayProblems::threeSum(vector<int> &nums)
+{
+    sort(nums.begin(), nums.end());
+    vector<vector<int>> res;
+
+    for (int i = 0; i < nums.size(); i++)
+    {
+        if (i > 0 && nums[i] == nums[i - 1])
+            continue;
+
+        int left = i + 1, right = nums.size() - 1;
+        while (left < right)
+        {
+            int sum = nums[i] + nums[left] + nums[right];
+            if (sum == 0)
+            {
+                res.push_back({nums[i], nums[left], nums[right]});
+                left++;
+                right--;
+
+                while (left < right && nums[left] == nums[left - 1])
+                    left++;
+                while (left < right && nums[right] == nums[right + 1])
+                    right--;
+            }
+            else if (sum > 0)
+                right--;
+            else
+                left++;
+        }
+    }
+    return res;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -840,13 +980,13 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {3, 1, -2, -5, 2, -4};
+    int arr[10] = {3, 1, 2, -5, 2, -4};
     int n = 6;
 
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
-    vector<int> nums = {4, 7, 1, 0};
+    vector<int> nums = {-1, 0, 1, 2, -1, -4};
     vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
 
     ArrayProblems obj1(arr, n, arr2, n2);
@@ -906,6 +1046,26 @@ int main()
     // for (auto val : spiral)
     //     cout << val << " ";
     // cout << endl;
+    // cout << "Total number of subarrays with sum equal to k is: " << obj1.subarraySum(nums, 5) << endl;
+    // vector<vector<int>> pascal = obj1.pascalTriangle(5);
+    // cout << "Pascal's Triangle:" << endl;
+    // for(auto row : pascal)
+    // {
+    //     for (auto val : row)
+    //         cout << val << " ";
+    //     cout << endl;
+    // }
+    // for (auto val : obj1.majorityElement(nums))
+    //     cout << val << " ";
+    // cout << endl;
+    vector<vector<int>> triplets = obj1.threeSum(nums);
+    cout << "Unique triplets in the array which gives the sum of zero are: " << endl;
+    for (auto row : triplets)
+    {
+        for (auto val : row)
+            cout << val << " ";
+        cout << endl;
+    }
 
     return 0;
 }
