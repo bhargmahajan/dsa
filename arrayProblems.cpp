@@ -213,6 +213,30 @@ public:
         Space Complexity: O(1)
     */
     vector<vector<int>> threeSum(vector<int> &nums);
+    /*
+        Function to find all unique quardlets in the array which gives the target sum
+        Time Complexity: O(n*log n + n^3)
+        Space Complexity: O(1)
+    */
+    vector<vector<int>> fourSum(vector<int> &nums, int target);
+    /*
+        Function to find subarray sum
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int subArraySum(vector<int> &nums);
+    /*
+        Function to find subarray xor
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int subArrayXor(vector<int> &nums, int k);
+    /*
+        Function to merge intervals
+        Time Complexity: O(n)
+        Space Complexity: O(n)
+    */
+    vector<vector<int>> mergeIntervals(vector<vector<int>> &intervals);
 
     ~ArrayProblems();
 };
@@ -973,6 +997,99 @@ vector<vector<int>> ArrayProblems::threeSum(vector<int> &nums)
     return res;
 }
 
+vector<vector<int>> ArrayProblems::fourSum(vector<int> &nums, int target)
+{
+    vector<vector<int>> res;
+    sort(nums.begin(), nums.end());
+
+    for (int i = 0; i < nums.size(); i++)
+    {
+        if (i > 0 && nums[i] == nums[i - 1])
+            continue;
+
+        for (int j = i + 1; j < nums.size(); j++)
+        {
+            if (j > i + 1 && nums[j] == nums[j - 1])
+                continue;
+
+            int left = j + 1, right = nums.size() - 1;
+            while (left < right)
+            {
+                long long sum = (long long)nums[i] + nums[j] + nums[left] + nums[right];
+                if (sum == target)
+                {
+                    res.push_back({nums[i], nums[j], nums[left], nums[right]});
+                    left++;
+                    right--;
+
+                    while (left < right && nums[left] == nums[left - 1])
+                        left++;
+                    while (left < right && nums[right] == nums[right + 1])
+                        right--;
+                }
+                else if (sum > target)
+                    right--;
+                else
+                    left++;
+            }
+        }
+    }
+    return res;
+}
+
+int ArrayProblems::subArraySum(vector<int> &nums)
+{
+    unordered_map<int, int> mp;
+    int sum = 0, maxLen = 0;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        sum += nums[i];
+        if (sum == 0)
+            maxLen = i + 1;
+
+        else
+        {
+            if (mp.find(sum) != mp.end())
+                maxLen = max(maxLen, i - mp[sum]);
+            else
+                mp[sum] = i;
+        }
+    }
+    return maxLen;
+}
+
+int ArrayProblems::subArrayXor(vector<int> &nums, int k)
+{
+    unordered_map<int, int> mp;
+    int x = 0, count = 0;
+    mp[0] = 1;
+    for (int i = 0; i < nums.size(); i++)
+    {
+        x ^= nums[i];
+        int target = k ^ x;
+        if (mp.find(x) != mp.end())
+            count++;
+
+        mp[x]++;
+    }
+    return count;
+}
+
+vector<vector<int>> ArrayProblems::mergeIntervals(vector<vector<int>> &intervals)
+{
+    vector<vector<int>> res;
+    sort(intervals.begin(), intervals.end());
+
+    for (auto interval : intervals)
+    {
+        if (res.empty() || res.back()[1] < interval[0])
+            res.push_back({interval[0], interval[1]});
+        if (res.back()[1] >= interval[0])
+            res.back()[1] = max(res.back()[1], interval[1]);
+    }
+    return res;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -1058,14 +1175,33 @@ int main()
     // for (auto val : obj1.majorityElement(nums))
     //     cout << val << " ";
     // cout << endl;
-    vector<vector<int>> triplets = obj1.threeSum(nums);
-    cout << "Unique triplets in the array which gives the sum of zero are: " << endl;
-    for (auto row : triplets)
-    {
-        for (auto val : row)
-            cout << val << " ";
-        cout << endl;
-    }
+    // vector<vector<int>> triplets = obj1.threeSum(nums);
+    // cout << "Unique triplets in the array which gives the sum of zero are: " << endl;
+    // for (auto row : triplets)
+    // {
+    //     for (auto val : row)
+    //         cout << val << " ";
+    //     cout << endl;
+    // }
+    // vector<vector<int>> quadret = obj1.fourSum(nums, 2);
+    // cout << "Unique quardlets in the array which gives the target sum are: " << endl;
+    // for (auto row : quadret)
+    // {
+    //     for (auto val : row)
+    //         cout << val << " ";
+    //     cout << endl;
+    // }
+    // cout << "Length of longest subarray with sum zero is: " << obj1.subArraySum(nums) << endl;
+    // cout << "Total subarrays with given xor is: " << obj1.subArrayXor(nums, 2) << endl;
+    // vector<vector<int>> intervals = {{1, 3}, {2, 4}, {5, 7}, {6, 8}};
+    // vector<vector<int>> mergedIntervals = obj1.mergeIntervals(intervals);
+    // cout << "Merged Intervals are: " << endl;
+    // for (auto row : mergedIntervals)
+    // {
+    //     for (auto val : row)
+    //         cout << val << " ";
+    //     cout << endl;
+    // }
 
     return 0;
 }
