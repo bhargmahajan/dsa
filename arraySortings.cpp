@@ -81,29 +81,19 @@ void ArraySortings::merge(int arr[], int left, int mid, int right)
     while (a <= mid && b <= right)
     {
         if (arr[a] <= arr[b])
-        {
             temp[i++] = arr[a++];
-        }
         else
-        {
             temp[i++] = arr[b++];
-        }
     }
 
     while (a <= mid)
-    {
         temp[i++] = arr[a++];
-    }
 
     while (b <= right)
-    {
         temp[i++] = arr[b++];
-    }
 
     for (int i = left; i <= right; i++)
-    {
         arr[i] = temp[i - left];
-    }
 }
 
 void ArraySortings::partition(int arr[], int left, int right)

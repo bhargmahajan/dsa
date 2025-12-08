@@ -237,6 +237,25 @@ public:
         Space Complexity: O(n)
     */
     vector<vector<int>> mergeIntervals(vector<vector<int>> &intervals);
+    /*
+        Function to merge two sorted arrays
+        Time Complexity: O(m+n)
+        Space Complexity: O(1)
+    */
+    void mergeArrays(vector<int> &nums1, int m, vector<int> &nums2, int n);
+    /*
+        Function to find missing and duplicate number in an array
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    vector<int> repeatingAndMissingNumber(vector<int> &nums);
+    /*
+        Function to count inversions in an array
+        Time Complexity: O(n log n)
+        Space Complexity: O(n)
+    */
+    int inversions(vector<int> &nums, int low, int high);
+    int merge(vector<int> &nums, int low, int mid, int high);
 
     ~ArrayProblems();
 };
@@ -1090,6 +1109,79 @@ vector<vector<int>> ArrayProblems::mergeIntervals(vector<vector<int>> &intervals
     return res;
 }
 
+void ArrayProblems::mergeArrays(vector<int> &nums1, int m, vector<int> &nums2, int n)
+{
+    int i = m - 1, j = n - 1, k = m + n - 1;
+    while (j >= 0)
+    {
+        if (i >= 0 && nums1[i] > nums2[j])
+            nums1[k--] = nums1[i--];
+        else
+            nums1[k--] = nums2[j--];
+    }
+}
+
+vector<int> ArrayProblems::repeatingAndMissingNumber(vector<int> &nums)
+{
+    vector<int> res(2);
+    int nSum = (nums.size() * (nums.size() + 1)) / 2, nSquareSum = (nums.size() * (nums.size() + 1) * (2 * nums.size() + 1)) / 6;
+    int tSum = 0, tSquareSum = 0;
+
+    for (int i = 0; i < nums.size(); i++)
+    {
+        tSquareSum += (nums[i] * nums[i]);
+        tSum += nums[i];
+    }
+
+    int diff = tSum - nSum, squareDiff = (tSquareSum - nSquareSum) / diff;
+    res[0] = (diff + squareDiff) / 2;
+    res[1] = res[0] - diff;
+
+    return res;
+}
+
+int ArrayProblems::merge(vector<int> &nums, int left, int mid, int right)
+{
+    int temp[10];
+    int a = left, b = mid + 1, cnt = 0;
+    int i = 0;
+
+    while (a <= mid && b <= right)
+    {
+        if (nums[a] <= nums[b])
+            temp[i++] = nums[a++];
+        else
+        {
+            temp[i++] = nums[b++];
+            cnt += (mid - a + 1);
+        }
+    }
+
+    while (a <= mid)
+        temp[i++] = nums[a++];
+
+    while (b <= right)
+        temp[i++] = nums[b++];
+
+    for (int s = left; s <= right; s++)
+        nums[s] = temp[s - left];
+
+    return cnt;
+}
+
+int ArrayProblems::inversions(vector<int> &nums, int low, int high)
+{
+    int cnt = 0;
+    if (low >= high)
+        return cnt;
+
+    int mid = (low + high) / 2;
+    cnt += inversions(nums, low, mid);
+    cnt += inversions(nums, mid + 1, high);
+    cnt += merge(nums, low, mid, high);
+
+    return cnt;
+}
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -1103,7 +1195,10 @@ int main()
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
-    vector<int> nums = {-1, 0, 1, 2, -1, -4};
+    vector<int> nums = {5, 4, 3, 2, 1};
+    vector<int> nums2 = {2, 4, 6, 8};
+    vector<int> nums1 = {1, 2, 3, 0, 0, 0, 0};
+
     vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
 
     ArrayProblems obj1(arr, n, arr2, n2);
@@ -1202,6 +1297,14 @@ int main()
     //         cout << val << " ";
     //     cout << endl;
     // }
+    // cout << "Merged sorted array is: " << endl;
+    // obj1.mergeArrays(nums1, nums1.size() - nums2.size(), nums2, nums2.size());
+    // for (auto val : nums1)
+    //     cout << val << " ";
+    // cout << endl;
+    // vector<int> ar = obj1.repeatingAndMissingNumber(nums);
+    // cout << "Missing number is: " << ar[1] << ", Repeating number is: " << ar[0] << endl;
+    cout << "Total inversions in the array are: " << obj1.inversions(nums, 0, nums.size() - 1) << endl;
 
     return 0;
 }
