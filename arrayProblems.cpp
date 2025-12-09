@@ -256,6 +256,21 @@ public:
     */
     int inversions(vector<int> &nums, int low, int high);
     int merge(vector<int> &nums, int low, int mid, int high);
+    /*
+        Function to count reverse pairs in an array
+        Time Complexity: O(n log n)
+        Space Complexity: O(n)
+    */
+    int reversePairs(vector<int> &nums);
+    int divideArrayForPairs(vector<int> &nums, int low, int high);
+    int countPairs(vector<int> &nums, int low, int mid, int high);
+    void mergeArrayForPairs(vector<int> &nums, int left, int mid, int right);
+    /*
+        Function to get the maximum subarray product
+        Time Complexity: O(2n*log n)
+        Space Complexity: O(1)
+    */
+    int maxProduct(vector<int> &nums);
 
     ~ArrayProblems();
 };
@@ -1182,6 +1197,91 @@ int ArrayProblems::inversions(vector<int> &nums, int low, int high)
 
     return cnt;
 }
+
+void ArrayProblems::mergeArrayForPairs(vector<int> &nums, int left, int mid, int right)
+{
+    int a = left, b = mid + 1, i = 0;
+    vector<int> temp;
+    while (a <= mid && b <= right)
+    {
+        if (nums[a] <= nums[b])
+        {
+            temp.push_back(nums[a]);
+            a++;
+        }
+        else
+        {
+            temp.push_back(nums[b]);
+            b++;
+        }
+    }
+
+    while (a <= mid)
+    {
+        temp.push_back(nums[a]);
+        a++;
+    }
+    while (b <= right)
+    {
+        temp.push_back(nums[b]);
+        b++;
+    }
+    for (int s = left; s <= right; s++)
+        nums[s] = temp[s - left];
+}
+
+int ArrayProblems::countPairs(vector<int> &nums, int low, int mid, int high)
+{
+    int cnt = 0, right = mid + 1;
+    for (int i = low; i <= mid; i++)
+    {
+        while (right <= high && nums[i] > 2 * (long long)nums[right])
+            right++;
+        cnt += (right - (mid + 1));
+    }
+
+    return cnt;
+}
+
+int ArrayProblems::divideArrayForPairs(vector<int> &nums, int low, int high)
+{
+    int cnt = 0;
+    if (low >= high)
+        return cnt;
+
+    int mid = (low + high) / 2;
+    cnt += divideArrayForPairs(nums, low, mid);
+    cnt += divideArrayForPairs(nums, mid + 1, high);
+    cnt += countPairs(nums, low, mid, high);
+    mergeArrayForPairs(nums, low, mid, high);
+
+    return cnt;
+}
+
+int ArrayProblems::reversePairs(vector<int> &nums)
+{
+    return divideArrayForPairs(nums, 0, nums.size() - 1);
+}
+
+int ArrayProblems::maxProduct(vector<int> &nums)
+{
+    int maxProduct = INT_MIN, start = 1, end = 1, n = nums.size();
+
+    for (int i = 0; i < n; i++)
+    {
+        if (start == 0)
+            start = 1;
+        if (end == 0)
+            end = 1;
+
+        start *= nums[i];
+        end *= nums[n - i - 1];
+        maxProduct = max(maxProduct, max(start, end));
+    }
+
+    return maxProduct;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -1304,7 +1404,9 @@ int main()
     // cout << endl;
     // vector<int> ar = obj1.repeatingAndMissingNumber(nums);
     // cout << "Missing number is: " << ar[1] << ", Repeating number is: " << ar[0] << endl;
-    cout << "Total inversions in the array are: " << obj1.inversions(nums, 0, nums.size() - 1) << endl;
+    // cout << "Total inversions in the array are: " << obj1.inversions(nums, 0, nums.size() - 1) << endl;
+    // cout << "Total reverse pairs in the array are: " << reversePairs(nums) << endl;
+    cout << "Maximum product subarray is: " << obj1.maxProduct(nums) << endl;
 
     return 0;
 }
