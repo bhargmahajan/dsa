@@ -271,6 +271,37 @@ public:
         Space Complexity: O(1)
     */
     int maxProduct(vector<int> &nums);
+    /*
+        Function to find the lower bound of a target in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int lowerBound(vector<int> &nums, int target);
+    /*
+        Function to find the upper bound of a target in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int upperBound(vector<int> &nums, int target);
+    /*
+        Function to find floor and ceil of a target in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    vector<int> floorAndCeil(vector<int> &nums, int target);
+    /*
+        Function to search for a range of target in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    vector<int> searchRange(vector<int> &nums, int target);
+    int findBoundIndex(vector<int> &nums, int target);
+    /*
+        Function to find frequency of a target in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int frequency(vector<int> &nums, int target);
 
     ~ArrayProblems();
 };
@@ -1282,6 +1313,99 @@ int ArrayProblems::maxProduct(vector<int> &nums)
     return maxProduct;
 }
 
+int ArrayProblems::lowerBound(vector<int> &nums, int target)
+{
+    int index = -1;
+    int left = 0, right = nums.size() - 1;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        if (nums[mid] >= target)
+        {
+            right = mid - 1;
+            index = mid;
+        }
+        else if (nums[mid] < target)
+            left = mid + 1;
+    }
+    return index;
+}
+
+int ArrayProblems::upperBound(vector<int> &nums, int target)
+{
+    int index = nums.size(), left = 0, right = nums.size() - 1;
+
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        if (nums[mid] > target)
+        {
+            index = mid;
+            right = mid - 1;
+        }
+        else
+            left = mid + 1;
+    }
+    return index;
+}
+
+vector<int> ArrayProblems::floorAndCeil(vector<int> &nums, int target)
+{
+    int xfloor = nums.size(), xceil = nums.size(), left = 0, right = nums.size() - 1;
+
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        if (nums[mid] >= target)
+        {
+            right = mid - 1;
+            xceil = nums[mid];
+        }
+        if (nums[mid] <= target)
+        {
+            left = mid + 1;
+            xfloor = nums[mid];
+        }
+    }
+    vector<int> index = {xfloor, xceil};
+    return index;
+}
+
+int ArrayProblems::findBoundIndex(vector<int> &nums, int target)
+{
+    int low = 0, high = nums.size() - 1;
+    while (low <= high)
+    {
+        int mid = (low + high) / 1;
+        if (nums[mid] < target)
+        {
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+    return low;
+}
+
+vector<int> ArrayProblems::searchRange(vector<int> &nums, int target)
+{
+    vector<int> res;
+    res.push_back(findBoundIndex(nums, target));
+    res.push_back(findBoundIndex(nums, target + 1) - 1);
+    if (res[0] < nums.size() && nums[res[0]] == target)
+        return res;
+
+    return {-1, -1};
+}
+
+int ArrayProblems::frequency(vector<int> &nums, int target)
+{
+    vector<int> r=searchRange(nums, target);
+    return r[1]-r[0]+1;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -1295,7 +1419,7 @@ int main()
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
-    vector<int> nums = {5, 4, 3, 2, 1};
+    vector<int> nums = {2, 2, 3, 3, 3, 3, 4};
     vector<int> nums2 = {2, 4, 6, 8};
     vector<int> nums1 = {1, 2, 3, 0, 0, 0, 0};
 
@@ -1406,7 +1530,12 @@ int main()
     // cout << "Missing number is: " << ar[1] << ", Repeating number is: " << ar[0] << endl;
     // cout << "Total inversions in the array are: " << obj1.inversions(nums, 0, nums.size() - 1) << endl;
     // cout << "Total reverse pairs in the array are: " << reversePairs(nums) << endl;
-    cout << "Maximum product subarray is: " << obj1.maxProduct(nums) << endl;
+    // cout << "Maximum product subarray is: " << obj1.maxProduct(nums) << endl;
+    // cout << "Lower bound array is: " << obj1.lowerBound(nums, 6) << endl;
+    // cout << "Upper bound array is: " << obj1.upperBound(nums, 9) << endl;
+    // cout << "Floor and Ceil indices are: " << obj1.floorAndCeil(nums, 5)[0] << ", " << obj1.floorAndCeil(nums, 5)[1] << endl;
+    //cout << "First and Last indices are: " << obj1.searchRange(nums, 4)[0] << ", " << obj1.searchRange(nums, 4)[1] << endl;
+    cout << "Frequency of target element is: " << obj1.frequency(nums, 3) << endl;
 
     return 0;
 }
