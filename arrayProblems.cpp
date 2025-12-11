@@ -302,6 +302,36 @@ public:
         Space Complexity: O(1)
     */
     int frequency(vector<int> &nums, int target);
+    /*
+        Function to search for a target in a rotated sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int searchInRotatedArrayOne(vector<int> &nums, int target);
+    /*
+        Function to find minimum in a rotated sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int findMin(vector<int> &nums);
+    /*
+        Function to find the rotation count in a rotated sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int rotationCount(vector<int> &nums);
+    /*
+        Function to find the single non-duplicate element in a sorted array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int singleNonDuplicate(vector<int> &nums);
+    /*
+        Function to find a peak element in an array
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int findPeakElement(vector<int> &nums);
 
     ~ArrayProblems();
 };
@@ -1376,7 +1406,7 @@ int ArrayProblems::findBoundIndex(vector<int> &nums, int target)
     int low = 0, high = nums.size() - 1;
     while (low <= high)
     {
-        int mid = (low + high) / 1;
+        int mid = (low + high) / 2;
         if (nums[mid] < target)
         {
             low = mid + 1;
@@ -1402,8 +1432,115 @@ vector<int> ArrayProblems::searchRange(vector<int> &nums, int target)
 
 int ArrayProblems::frequency(vector<int> &nums, int target)
 {
-    vector<int> r=searchRange(nums, target);
-    return r[1]-r[0]+1;
+    vector<int> r = searchRange(nums, target);
+    return r[1] - r[0] + 1;
+}
+
+int ArrayProblems::searchInRotatedArrayOne(vector<int> &nums, int target)
+{
+    int left = 0, right = nums.size() - 1;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        if (nums[mid] == target)
+            return mid;
+
+        if (nums[left] == nums[mid] && nums[mid] == nums[right])
+        {
+            left++;
+            right--;
+            continue;
+        }
+
+        if (nums[left] <= nums[mid])
+        {
+            if (target >= nums[left] && target < nums[mid])
+                right = mid - 1;
+            else
+                left = mid + 1;
+        }
+        else
+        {
+            if (target <= nums[right] && target > nums[mid])
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+    }
+    return -1;
+}
+
+int ArrayProblems::findMin(vector<int> &nums)
+{
+    int left = 0, right = nums.size() - 1;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+
+        if (nums[right] > nums[mid])
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return nums[left - 1];
+}
+
+int ArrayProblems::rotationCount(vector<int> &nums)
+{
+    int left = 0, right = nums.size() - 1;
+
+    while (left <= right)
+    {
+        int mid = (left + right) / 2;
+        if (nums[right] > nums[mid])
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left - 1;
+}
+
+int ArrayProblems::singleNonDuplicate(vector<int> &nums)
+{
+    if (nums.size() == 1)
+        return nums[0];
+    if (nums[0] != nums[1])
+        return nums[0];
+    if (nums[nums.size() - 1] != nums[nums.size() - 2])
+        return nums[nums.size() - 1];
+    int left = 1, right = nums.size() - 2;
+
+    while (left <= right)
+    {
+        int mid = (left + right) / 2;
+
+        if (nums[mid] != nums[mid + 1] && nums[mid] != nums[mid - 1])
+        {
+            return nums[mid];
+        }
+
+        if ((mid % 2 == 0 && nums[mid] == nums[mid + 1]) ||
+            (mid % 2 == 1 && nums[mid] == nums[mid - 1]))
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return -1;
+}
+
+int ArrayProblems::findPeakElement(vector<int> &nums)
+{
+    int left = 0, right = nums.size() - 1;
+
+    while (left < right)
+    {
+        int mid = (left + right) / 2;
+        if (nums[mid] > nums[mid + 1])
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
 }
 
 ArrayProblems::~ArrayProblems()
@@ -1419,7 +1556,7 @@ int main()
     int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
     int n2 = 7;
 
-    vector<int> nums = {2, 2, 3, 3, 3, 3, 4};
+    vector<int> nums = {3, 4, 5, 1, 2};
     vector<int> nums2 = {2, 4, 6, 8};
     vector<int> nums1 = {1, 2, 3, 0, 0, 0, 0};
 
@@ -1534,8 +1671,13 @@ int main()
     // cout << "Lower bound array is: " << obj1.lowerBound(nums, 6) << endl;
     // cout << "Upper bound array is: " << obj1.upperBound(nums, 9) << endl;
     // cout << "Floor and Ceil indices are: " << obj1.floorAndCeil(nums, 5)[0] << ", " << obj1.floorAndCeil(nums, 5)[1] << endl;
-    //cout << "First and Last indices are: " << obj1.searchRange(nums, 4)[0] << ", " << obj1.searchRange(nums, 4)[1] << endl;
-    cout << "Frequency of target element is: " << obj1.frequency(nums, 3) << endl;
+    // cout << "First and Last indices are: " << obj1.searchRange(nums, 4)[0] << ", " << obj1.searchRange(nums, 4)[1] << endl;
+    // cout << "Frequency of target element is: " << obj1.frequency(nums, 3) << endl;
+    // cout<< "Index of target element in rotated sorted array is: " << obj1.searchInRotatedArrayOne(nums, 3) << endl;
+    // cout << "Minimum element in rotated sorted array is: " << obj1.findMin(nums) << endl;
+    // cout << "Rotation count of rotated sorted array is: " << obj1.rotationCount(nums) << endl;
+    // cout << "Single element in sorted array is: " << obj1.singleNonDuplicate(nums) << endl;
+    cout << "Peak element in the array is at index: " << obj1.findPeakElement(nums) << endl;
 
     return 0;
 }
