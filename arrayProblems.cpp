@@ -332,6 +332,30 @@ public:
         Space Complexity: O(1)
     */
     int findPeakElement(vector<int> &nums);
+    /*
+        Function to find the square root of a number
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int squareRoot(int x);
+    /*
+        Function to find the nth root of a number
+        Time Complexity: O(log n)
+        Space Complexity: O(1)
+    */
+    int nthRoot(int num1, int num2);
+    /*
+        Function to find the minimum eating speed to finish piles of bananas in h hours
+        Time Complexity: O(n log m) where m is the maximum number of bananas in a pile
+        Space Complexity: O(1)
+    */
+    int minEatingSpeed(vector<int> &piles, int h);
+    /*
+        Function to find the minimum number of days to make m bouquets
+        Time Complexity: O(n log m) where m is the maximum number of days in bloomDay
+        Space Complexity: O(1)
+    */
+    int minDays(vector<int> &bloomDay, int m, int k);
 
     ~ArrayProblems();
 };
@@ -705,7 +729,6 @@ void ArrayProblems::sortOnesTwosAndZeroes()
 
 int ArrayProblems::majorityElement()
 {
-
     if (this->n < 2)
         return -1;
 
@@ -1543,6 +1566,113 @@ int ArrayProblems::findPeakElement(vector<int> &nums)
     return left;
 }
 
+int ArrayProblems::squareRoot(int num)
+{
+    if (num < 2)
+        return num;
+
+    int left = 1, right = num / 2;
+    int ans = 0;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        if (mid * mid <= num)
+        {
+            ans = mid;
+            left = mid + 1;
+        }
+        else
+            right = mid - 1;
+    }
+    return ans;
+}
+
+int ArrayProblems::nthRoot(int num1, int num2)
+{
+    int left = 1, right = num2;
+    int ans = 0;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        int power = 1;
+        for (int i = 1; i <= num1; i++)
+        {
+            power *= mid;
+            if (power > num2)
+                break;
+        }
+
+        if (power == num2)
+            return mid;
+        else if (power < num2)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return -1;
+}
+
+int ArrayProblems::minEatingSpeed(vector<int> &piles, int h)
+{
+    int maxPile = *max_element(piles.begin(), piles.end());
+    int left = 1, right = maxPile, ans = maxPile;
+
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        long long sum = 0;
+
+        for (int p : piles)
+            sum += ceil((double)p / mid);
+
+        if (sum <= h)
+        {
+            ans = mid;
+            right = mid - 1;
+        }
+        else
+            left = mid + 1;
+    }
+    return ans;
+}
+
+int ArrayProblems::minDays(vector<int> &bloomDay, int m, int k)
+{
+    long long flowers = (long long)m * k;
+
+    if (flowers > bloomDay.size())
+        return -1;
+
+    int left = *min_element(bloomDay.begin(), bloomDay.end()),
+        right = *max_element(bloomDay.begin(), bloomDay.end());
+    int ans = right;
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+
+        int cnt = 0, noOfBoq = 0;
+        for (auto bloom : bloomDay)
+        {
+            if (bloom <= mid)
+                cnt++;
+            else
+            {
+                noOfBoq += cnt / k;
+                cnt = 0;
+            }
+        }
+        noOfBoq += cnt / k;
+        if (noOfBoq >= m)
+        {
+            ans = mid;
+            right = mid - 1;
+        }
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
 ArrayProblems::~ArrayProblems()
 {
     cout << "Destructor called." << endl;
@@ -1677,7 +1807,11 @@ int main()
     // cout << "Minimum element in rotated sorted array is: " << obj1.findMin(nums) << endl;
     // cout << "Rotation count of rotated sorted array is: " << obj1.rotationCount(nums) << endl;
     // cout << "Single element in sorted array is: " << obj1.singleNonDuplicate(nums) << endl;
-    cout << "Peak element in the array is at index: " << obj1.findPeakElement(nums) << endl;
+    // cout << "Peak element in the array is at index: " << obj1.findPeakElement(nums) << endl;
+    // cout << "Square root of the number is: " << obj1.squareRoot(4) << endl;
+    // cout << "Nth root of the number is: " << obj1.nthRoot(4, 69) << endl;
+    // cout << "Minimum eating speed to finish the piles in given hours is: " << obj1.minEatingSpeed(nums2, 8) << endl;
+    cout << "Minimum days to make m bouquets is: " << obj1.minDays(nums2, 3, 6) << endl;
 
     return 0;
 }
