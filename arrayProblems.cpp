@@ -356,6 +356,24 @@ public:
         Space Complexity: O(1)
     */
     int minDays(vector<int> &bloomDay, int m, int k);
+    /*
+        Function to find the smallest divisor such that the sum of the division results is less than or equal to threshold
+        Time Complexity: O(n log m) where m is the maximum number in nums
+        Space Complexity: O(1)
+    */
+    int ArrayProblems::smallestDivisor(vector<int> &nums, int threshold);
+    /*
+        Function to find the least weight capacity of a ship to ship all packages within days
+        Time Complexity: O(n log m) where m is the sum of weights
+        Space Complexity: O(1)
+    */
+    int shipWithinDays(vector<int> &weights, int days);
+    /*
+        Function to find the kth missing positive number
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int findKthPositive(vector<int> &arr, int k);
 
     ~ArrayProblems();
 };
@@ -1671,6 +1689,75 @@ int ArrayProblems::minDays(vector<int> &bloomDay, int m, int k)
             left = mid + 1;
     }
     return left;
+}
+
+int ArrayProblems::smallestDivisor(vector<int> &nums, int threshold)
+{
+    int left = 1, right = *max_element(nums.begin(), nums.end()), ans = threshold;
+
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+        long long sum = 0;
+
+        for (int p : nums)
+            sum += ceil((double)p / mid);
+
+        if (sum <= threshold)
+        {
+            ans = mid;
+            right = mid - 1;
+        }
+        else
+            left = mid + 1;
+    }
+    return ans;
+}
+
+int ArrayProblems::shipWithinDays(vector<int> &weights, int days)
+{
+    int right = accumulate(weights.begin(), weights.end(), 0),
+        left = *max_element(weights.begin(), weights.end());
+
+    while (left < right)
+    {
+        int mid = (right + left) / 2;
+
+        int wSum = 0, d = 1;
+        for (int w : weights)
+        {
+            if (wSum + w > mid)
+            {
+                wSum = w;
+                d++;
+            }
+            else
+                wSum += w;
+        }
+
+        if (d <= days)
+            right = mid;
+        else
+            left = mid + 1;
+    }
+    return left;
+}
+
+int ArrayProblems::findKthPositive(vector<int> &arr, int k)
+{
+    int right = arr.size(), left = 0;
+
+    while (left < right)
+    {
+        int mid = (right + left) / 2;
+        int missing = arr[mid] - (mid + 1);
+
+        if (missing < k)
+            left = mid + 1;
+        else
+            right = mid;
+    }
+    return left + k;
 }
 
 ArrayProblems::~ArrayProblems()
