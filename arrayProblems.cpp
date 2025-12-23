@@ -374,6 +374,18 @@ public:
         Space Complexity: O(1)
     */
     int findKthPositive(vector<int> &arr, int k);
+    /*
+        Function to split an array into k subarrays with minimum maximum sum
+        Time Complexity: O(n log sum(arr[])-max(arr[])+1)) where m is the sum of elements
+        Space Complexity: O(1)
+    */
+    int splitArray(vector<int> &nums, int k);
+    /*
+        Function to find the median of two sorted arrays
+        Time Complexity: O(log(min(n, m)))
+        Space Complexity: O(1)
+    */
+    double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2);
 
     ~ArrayProblems();
 };
@@ -1758,6 +1770,68 @@ int ArrayProblems::findKthPositive(vector<int> &arr, int k)
             right = mid;
     }
     return left + k;
+}
+
+int ArrayProblems::splitArray(vector<int> &nums, int k)
+{
+    int left = *max_element(nums.begin(), nums.end()), right = 0;
+    for (int w : nums)
+    {
+        right += w;
+    }
+
+    while (left <= right)
+    {
+        int mid = (right + left) / 2;
+
+        int wSum = 0, d = 1;
+        for (int w : nums)
+        {
+            if (wSum + w > mid)
+            {
+                wSum = w;
+                d++;
+            }
+            else
+                wSum += w;
+        }
+
+        if (d > k)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return left;
+}
+
+double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2)
+{
+    if (nums1.size() > nums2.size())
+        return findMedianSortedArrays(nums2, nums1);
+
+    int left = 0, right = nums1.size();
+
+    while (left <= right)
+    {
+        int mid1 = (left + right) / 2;
+        int mid2 = (nums1.size() + nums2.size() + 1) / 2 - mid1;
+        int l1 = (mid1 == 0) ? INT_MIN : nums1[mid1 - 1];
+        int l2 = (mid2 == 0) ? INT_MIN : nums2[mid2 - 1];
+        int r1 = (mid1 == nums1.size()) ? INT_MAX : nums1[mid1];
+        int r2 = (mid2 == nums2.size()) ? INT_MAX : nums2[mid2];
+        if (l1 <= r2 && l2 <= r1)
+        {
+            if ((nums1.size() + nums2.size()) % 2 == 0)
+                return (max(l1, l2) + min(r1, r2)) / 2.0;
+            else
+                return max(l1, l2);
+        }
+        else if (l1 > l2)
+            right = mid1 - 1;
+        else
+            left = mid1 + 1;
+    }
+    return 0.0;
 }
 
 ArrayProblems::~ArrayProblems()
