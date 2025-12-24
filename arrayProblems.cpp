@@ -386,6 +386,12 @@ public:
         Space Complexity: O(1)
     */
     double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2);
+    /*
+        Function to search for a target in a 2D matrix
+        Time Complexity: O(log(m*n))
+        Space Complexity: O(1)
+    */
+    bool searchMatrix(vector<vector<int>> &matrix, int target);
 
     ~ArrayProblems();
 };
@@ -1832,6 +1838,26 @@ double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2)
             left = mid1 + 1;
     }
     return 0.0;
+}
+
+bool searchMatrix(vector<vector<int>> &matrix, int target)
+{
+    int left = 0, right = matrix.size() * matrix[0].size() - 1;
+
+    while (left <= right)
+    {
+        int mid = (left + right) / 2;
+        int r = mid / matrix[0].size();
+        int c = mid % matrix[0].size();
+
+        if (matrix[r][c] == target)
+            return true;
+        else if (matrix[r][c] < target)
+            left = mid + 1;
+        else
+            right = mid - 1;
+    }
+    return false;
 }
 
 ArrayProblems::~ArrayProblems()
