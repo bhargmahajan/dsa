@@ -38,6 +38,54 @@ public:
         }
         return res;
     }
+
+    /*
+        @description: reverses the order of words in a given string
+        @param: s - input string containing words separated by spaces
+        @return: string with words in reversed order
+        @time complexity: O(n), where n is the length of the input string
+        @space complexity: O(1), for the output string
+    */
+    string reverseWords(string s)
+    {
+        string res = "";
+        int i = s.length() - 1;
+        while (i >= 0)
+        {
+            while (i >= 0 && s[i] == ' ')
+                i--;
+            if (i < 0)
+                break;
+            int j = i;
+            while (i >= 0 && s[i] != ' ')
+            {
+                i--;
+            }
+            res += s.substr(i + 1, j - i) + ' ';
+        }
+
+        return res.substr(0, res.length() - 1);
+    }
+
+    /*
+        @description: finds the largest odd number that can be formed from the given string of digits
+        @param: num - input string containing digits
+        @return: string representing the largest odd number
+        @time complexity: O(n), where n is the length of the input string
+        @space complexity: O(1), for the output string
+    */
+    string largestOddNumber(string num)
+    {
+        int i = num.length() - 1;
+
+        while (i >= 0)
+        {
+            if ((num[i] - '0') % 2 != 0)
+                break;
+            i--;
+        }
+        return num.substr(0, i + 1);
+    }
 };
 
 int main()
