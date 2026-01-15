@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
+#include <climits>
 
 using namespace std;
 
@@ -178,6 +180,133 @@ public:
         }
 
         return true;
+    }
+
+    /*
+        @description: sorts characters in a string by their frequency in descending order
+        @param: s - input string
+        @return: string with characters sorted by frequency
+        @time complexity: O(n^2), where n is the length of the input string
+        @space complexity: O(1), for the frequency array
+    */
+    string frequencySort(string s)
+    {
+        vector<int> freq(256, 0);
+
+        for (char c : s)
+        {
+            freq[c]++;
+        }
+
+        string ans = "";
+        for (int i = 0; i < s.size(); i++)
+        {
+            int mx_freq = 0;
+            char mx_char = 0;
+
+            for (int j = 0; j < 256; j++)
+            {
+                if (freq[j] > mx_freq)
+                {
+                    mx_freq = freq[j];
+                    mx_char = (char)j;
+                }
+            }
+
+            if (mx_freq == 0)
+                break;
+
+            ans += string(mx_freq, mx_char);
+            freq[mx_char] = 0;
+        }
+        return ans;
+    }
+
+    /*
+        @description: finds the maximum depth of nested parentheses in a string
+        @param: s - input string containing parentheses
+        @return: integer representing the maximum depth of nested parentheses
+        @time complexity: O(n), where n is the length of the input string
+        @space complexity: O(1), for the depth counters
+    */
+    int maxDepth(string s)
+    {
+        int maxDep = 0, dep = 0;
+
+        for (char c : s)
+        {
+            if (c == '(')
+            {
+                dep++;
+                maxDep = max(maxDep, dep);
+            }
+            else if (c == ')')
+                dep--;
+        }
+
+        return maxDep;
+    }
+
+    /*
+        @description: converts a Roman numeral string to an integer
+        @param: s - input string containing Roman numerals
+        @return: integer representation of the Roman numeral
+        @time complexity: O(n), where n is the length of the input string
+        @space complexity: O(1), for the Roman numeral mapping
+    */
+    int romanToInt(string s)
+    {
+        unordered_map<char, int> roman = {{'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}};
+
+        int res = 0;
+
+        for (int i = 0; i < s.size() - 1; i++)
+        {
+            if (roman[s[i]] < roman[s[i + 1]])
+                res -= roman[s[i]];
+            else
+                res += roman[s[i]];
+        }
+
+        return res + roman[s[s.size() - 1]];
+    }
+
+    /*
+        @description: converts a string to a 32-bit signed integer (atoi)
+        @param: s - input string
+        @return: integer representation of the string
+        @time complexity: O(n), where n is the length of the input string
+        @space complexity: O(1), for the result variable
+    */
+    int myAtoi(string s)
+    {
+        int sign = 1, i = 0;
+        long res = 0;
+
+        while (i < s.size() && s[i] == ' ')
+            i++;
+
+        if (i == s.size())
+            return 0;
+
+        if (s[i] == '-')
+        {
+            sign = -1;
+            i++;
+        }
+        else if (s[i] == '+')
+            i++;
+
+        while (i < s.size() && isdigit(s[i]))
+        {
+            res = res * 10 + (s[i] - '0');
+            if (sign * res >= INT_MAX)
+                return INT_MAX;
+            if (sign * res <= INT_MIN)
+                return INT_MIN;
+            i++;
+        }
+        return (int)sign * res;
     }
 };
 
