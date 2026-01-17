@@ -35,9 +35,7 @@ public:
             {
                 cnt--;
                 if (cnt > 0)
-                {
                     res += ch;
-                }
             }
         }
         return res;
@@ -62,9 +60,7 @@ public:
                 break;
             int j = i;
             while (i >= 0 && s[i] != ' ')
-            {
                 i--;
-            }
             res += s.substr(i + 1, j - i) + ' ';
         }
 
@@ -102,9 +98,7 @@ public:
     {
         string res = "";
         sort(strs.begin(), strs.end());
-        for (int i = 0;
-             i < strs[0].size() && i < strs[strs.size() - 1].size();
-             i++)
+        for (int i = 0; i < strs[0].size() && i < strs[strs.size() - 1].size(); i++)
         {
             if (strs[0][i] == strs[strs.size() - 1][i])
                 res += strs[0][i];
@@ -194,9 +188,7 @@ public:
         vector<int> freq(256, 0);
 
         for (char c : s)
-        {
             freq[c]++;
-        }
 
         string ans = "";
         for (int i = 0; i < s.size(); i++)
@@ -307,6 +299,74 @@ public:
             i++;
         }
         return (int)sign * res;
+    }
+
+    int expandFromCenter(const string &str, int left, int right)
+    {
+        while (left >= 0 && right < str.length() && str[left] == str[right])
+        {
+            left--;
+            right++;
+        }
+        return right - left - 1;
+    }
+
+    /*
+        @description: finds the longest palindromic substring in a given string
+        @param: str - input string
+        @return: string representing the longest palindromic substring
+        @time complexity: O(n^2), where n is the length of the input string
+        @space complexity: O(1), for the output substring
+    */
+    string longestPalindrome(string str)
+    {
+        int start = 0, end = 0;
+
+        for (int i = 0; i < str.length(); i++)
+        {
+            int lenOdd = expandFromCenter(str, i, i);
+            int lenEven = expandFromCenter(str, i, i + 1);
+            int maxLen = max(lenOdd, lenEven);
+
+            if (maxLen > end - start)
+            {
+                start = i - (maxLen - 1) / 2;
+                end = i + maxLen / 2;
+            }
+        }
+
+        return str.substr(start, end - start + 1);
+    }
+
+    /*
+        @description: calculates the total beauty of all substrings of a given string
+        @param: s - input string
+        @return: integer representing the total beauty of all substrings
+        @time complexity: O(n^2 * m), where n is the length of the input string and m is the number of unique characters
+        @space complexity: O(m), for the frequency map
+    */
+    int beautySum(string s)
+    {
+        int sum = 0, n = s.length();
+
+        for (int i = 0; i < n; i++)
+        {
+            unordered_map<char, int> freq;
+            for (int j = i; j < n; j++)
+            {
+                freq[s[j]]++;
+
+                int maxi = INT_MIN;
+                int mini = INT_MAX;
+                for (auto it : freq)
+                {
+                    mini = min(mini, it.second);
+                    maxi = max(maxi, it.second);
+                }
+                sum += (maxi - mini);
+            }
+        }
+        return sum;
     }
 };
 
