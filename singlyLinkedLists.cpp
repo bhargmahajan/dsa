@@ -213,6 +213,94 @@ public:
 
         return nullptr;
     }
+
+    /*
+        @description: check if the singly linked list is a palindrome
+        @param: head - pointer to the head of the singly linked list
+        @return: bool - true if the singly linked list is a palindrome, false otherwise
+        @time complexity: O(n), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    bool isPalindrome(Node *head)
+    {
+        if (!head || head->next == nullptr)
+            return true;
+
+        Node *mid = middleNode(head);
+        Node *rev = reverseList(mid->next);
+        Node *first = head;
+        Node *second = rev;
+
+        while (second)
+        {
+            if (first->data != second->data)
+                return false;
+            first = first->next;
+            second = second->next;
+        }
+
+        return true;
+    }
+
+    /*
+        @description: rearrange the singly linked list such that all odd indexed nodes are together followed by the even indexed nodes
+        @param: head - pointer to the head of the singly linked list
+        @return: ListNode* - pointer to the head of the rearranged singly linked list
+        @time complexity: O(n), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    Node *oddEvenList(Node *head)
+    {
+        Node *oddHead = new Node(-1), *oddTail = oddHead;
+        Node *evenHead = new Node(-1), *evenTail = evenHead;
+        Node *curr = head, *temp;
+
+        while (curr)
+        {
+            temp = curr;
+            curr = curr->next;
+            temp->next = nullptr;
+            oddTail->next = temp;
+            oddTail = temp;
+
+            if (curr)
+            {
+                temp = curr;
+                curr = curr->next;
+                temp->next = nullptr;
+                evenTail->next = temp;
+                evenTail = temp;
+            }
+        }
+        oddTail->next = evenHead->next;
+
+        return oddHead->next;
+    }
+
+    /*
+        @description: remove the Nth node from the end of the singly linked list
+        @param: head - pointer to the head of the singly linked list
+        @param: n - integer representing the position from the end
+        @return: Node* - pointer to the head of the modified singly linked list
+        @time complexity: O(n), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    Node *removeNthFromEnd(Node *head, int n)
+    {
+        Node *dummy = new Node(0, head);
+        Node *fast = dummy, *slow = dummy;
+        for (int i = 0; i <= n; i++)
+            fast = fast->next;
+
+        while (fast)
+        {
+            fast = fast->next;
+            slow = slow->next;
+        }
+
+        slow->next = slow->next->next;
+        return dummy->next;
+    }
 };
 
 int main()
