@@ -301,6 +301,98 @@ public:
         slow->next = slow->next->next;
         return dummy->next;
     }
+
+    /*
+        @description: delete the middle node of the singly linked list
+        @param: head - pointer to the head of the singly linked list
+        @return: Node* - pointer to the head of the modified singly linked list
+        @time complexity: O(n/2), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    Node *deleteMiddle(Node *head)
+    {
+        if (head == nullptr || head->next == nullptr)
+            return nullptr;
+
+        Node *slow = head, *fast = head->next->next;
+
+        while (fast && fast->next != nullptr)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        slow->next = slow->next->next;
+
+        return head;
+    }
+
+    Node *middleNode(Node *head)
+    {
+        Node *slow = head;
+        Node *fast = head->next;
+
+        while (fast && fast->next != nullptr)
+        {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+
+        Node *mid = slow->next;
+        slow->next = nullptr;
+
+        return mid;
+    }
+
+    Node *mergeTwoSortedLinkedLists(Node *list1, Node *list2)
+    {
+        Node *dummyNode = new Node(-1);
+        Node *temp = dummyNode;
+
+        while (list1 && list2)
+        {
+            if (list1->data <= list2->data)
+            {
+                temp->next = list1;
+                list1 = list1->next;
+            }
+            else
+            {
+                temp->next = list2;
+                list2 = list2->next;
+            }
+            temp = temp->next;
+        }
+
+        if (list1 != nullptr)
+        {
+            temp->next = list1;
+        }
+        else
+        {
+            temp->next = list2;
+        }
+
+        return dummyNode->next;
+    }
+
+    /*
+        @description: sort the singly linked list using merge sort
+        @param: head - pointer to the head of the singly linked list
+        @return: Node* - pointer to the head of the sorted singly linked list
+        @time complexity: O(n log n), where n is the number of nodes in the singly linked list
+        @space complexity: O(log n), for the recursive stack space
+    */
+    Node *sortList(Node *head)
+    {
+        if (head == nullptr || !head->next)
+            return head;
+
+        Node *middle = middleNode(head);
+        Node *left = sortList(head);
+        Node *right = sortList(middle);
+
+        return mergeTwoSortedLinkedLists(left, right);
+    }
 };
 
 int main()
