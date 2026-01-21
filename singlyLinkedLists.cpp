@@ -393,6 +393,147 @@ public:
 
         return mergeTwoSortedLinkedLists(left, right);
     }
+
+    /*
+        @description: get the intersection node of two singly linked lists
+        @param: headA - pointer to the head of the first singly linked list
+        @param: headB - pointer to the head of the second singly linked list
+        @return: Node* - pointer to the intersection node, nullptr if there is no intersection
+        @time complexity: O(2 × max(length of list1, length of list2))
+        @space complexity: O(1), for the two pointers
+    */
+    Node *getIntersectionNode(Node *headA, Node *headB)
+    {
+        Node *t1 = headA, *t2 = headB;
+
+        while (t1 != t2)
+        {
+            t1 = t1 ? t1->next : headA;
+            t2 = t2 ? t2->next : headB;
+        }
+
+        return t1;
+    }
+
+    /*
+        @description: add two numbers represented by two singly linked lists
+        @param: l1 - pointer to the head of the first singly linked list
+        @param: l2 - pointer to the head of the second singly linked list
+        @return: Node* - pointer to the head of the resultant singly linked list
+        @time complexity: O(max(m, n)), where m and n are the lengths of the two singly linked lists
+        @space complexity: O(max(m, n)), for the resultant singly linked list
+    */
+    Node *addTwoNumbers(Node *l1, Node *l2)
+    {
+        Node *res = new Node(0), *temp = res;
+        int carry = 0;
+
+        while ((l1 || l2) || carry)
+        {
+            int sum = 0;
+
+            if (l1)
+            {
+                sum += l1->data;
+                l1 = l1->next;
+            }
+            if (l2)
+            {
+                sum += l2->data;
+                l2 = l2->next;
+            }
+            sum += carry;
+            carry = sum / 10;
+            Node *n = new Node(sum % 10);
+            temp->next = n;
+            temp = temp->next;
+        }
+        return res->next;
+    }
+
+    Node *getKthNode(Node *curr, int k)
+    {
+        while (curr && k > 0)
+        {
+            curr = curr->next;
+            k--;
+        }
+        return curr;
+    }
+
+    /*
+        @description: reverse nodes of a singly linked list k at a time
+        @param: head - pointer to the head of the singly linked list
+        @param: k - integer representing the group size
+        @return: ListNode* - pointer to the head of the modified singly linked list
+        @time complexity: O(n), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    Node *reverseKGroup(Node *head, int k)
+    {
+        Node *dummy = new Node(0);
+        dummy->next = head;
+        Node *groupPrev = dummy;
+
+        while (true)
+        {
+            Node *kth = getKthNode(groupPrev, k);
+            if (!kth)
+                break;
+
+            Node *groupNext = kth->next;
+            Node *prev = groupNext;
+            Node *curr = groupPrev->next;
+
+            for (int i = 0; i < k; i++)
+            {
+                Node *temp = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = temp;
+            }
+            Node *temp = groupPrev->next;
+            groupPrev->next = kth;
+            groupPrev = temp;
+        }
+
+        return dummy->next;
+    }
+
+    /*
+        @description: rotate the singly linked list to the right by k places
+        @param: head - pointer to the head of the singly linked list
+        @param: k - integer representing the number of places to rotate
+        @return: ListNode* - pointer to the head of the rotated singly linked list
+        @time complexity: O(n), where n is the number of nodes in the singly linked list
+        @space complexity: O(1), for the pointers used in the algorithm
+    */
+    Node *rotateRight(Node *head, int k)
+    {
+        if (!head || !head->next || k == 0)
+            return head;
+
+        int l = 1;
+        Node *last = head;
+
+        while (last->next)
+        {
+            last = last->next;
+            l++;
+        }
+
+        last->next = head;
+        k = k % l;
+        Node *temp = head;
+
+        for (int i = 1; i < l - k; i++)
+            temp = temp->next;
+
+        head = temp->next;
+        temp->next = nullptr;
+
+        return head;
+    }
 };
 
 int main()
