@@ -534,6 +534,71 @@ public:
 
         return head;
     }
+
+    void insertCopy(Node *head)
+    {
+        Node *temp = head;
+
+        while (temp)
+        {
+            Node *copy = new Node(temp->val);
+            Node *next = temp->next;
+            copy->next = next;
+            temp->next = copy;
+            temp = next;
+        }
+    }
+
+    void connectRandom(Node *head)
+    {
+        Node *temp = head;
+
+        while (temp)
+        {
+            Node *copyNode = temp->next;
+
+            if (temp->random)
+                copyNode->random = temp->random->next;
+            else
+                copyNode->random = nullptr;
+
+            temp = temp->next->next;
+        }
+    }
+
+    Node *getDeepCopy(Node *head)
+    {
+        Node *temp = head;
+        Node *dummyNode = new Node(-1);
+        Node *res = dummyNode;
+
+        while (temp)
+        {
+            res->next = temp->next;
+            res = res->next;
+            temp->next = temp->next->next;
+            temp = temp->next;
+        }
+
+        return dummyNode->next;
+    }
+
+    /*
+        @description: create a deep copy of a singly linked list with random pointers
+        @param: head - pointer to the head of the singly linked list
+        @return: Node* - pointer to the head of the deep copied singly linked list
+        @time complexity: O(3n), where n is the number of nodes in the singly linked list
+        @space complexity: O(n), for the pointers used in the algorithm
+    */
+    Node *copyRandomList(Node *head)
+    {
+        if (!head)
+            return nullptr;
+
+        insertCopy(head);
+        connectRandom(head);
+        return getDeepCopy(head);
+    }
 };
 
 int main()
