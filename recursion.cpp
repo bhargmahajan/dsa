@@ -99,6 +99,109 @@ public:
 
         return res;
     }
+
+    void helper(vector<int> &nums, int index, vector<int> &curr,
+                vector<vector<int>> &result)
+    {
+        if (index == nums.size())
+        {
+            result.push_back(curr);
+            return;
+        }
+
+        helper(nums, index + 1, curr, result);
+        curr.push_back(nums[index]);
+        helper(nums, index + 1, curr, result);
+        curr.pop_back();
+    }
+
+    /* @description: generate all possible subsets of a set of distinct integers
+     * @param {vector<int>} nums - input set of distinct integers
+     * @return {vector<vector<int>>} - list of all possible subsets
+     * @time complexity: O(n*2^n)
+     * @space complexity: O(n*2^n) for storing the result
+     */
+    vector<vector<int>> subsets(vector<int> &nums)
+    {
+        vector<vector<int>> res;
+        vector<int> curr;
+        helper(nums, 0, curr, res);
+        return res;
+    }
+
+    void findCombination(int index, int target, vector<int> &nums,
+                         vector<vector<int>> &ans, vector<int> &ds)
+    {
+        if (index == nums.size())
+        {
+            if (target == 0)
+                ans.push_back(ds);
+            return;
+        }
+
+        if (nums[index] <= target)
+        {
+            ds.push_back(nums[index]);
+            findCombination(index, target - nums[index], nums, ans, ds);
+            ds.pop_back();
+        }
+
+        findCombination(index + 1, target, nums, ans, ds);
+    }
+
+    /* @description: find all unique combinations in candidates where the candidate numbers sum to target
+     * @param {vector<int>} candidates - input set of candidate numbers
+     * @param {int} target - target sum
+     * @return {vector<vector<int>>} - list of all unique combinations
+     * @time complexity: O(2^t * k) where t is target and k is average length of combination
+     * @space complexity: O(k*x), where x is the number of combinations and k is their average length.
+     */
+    vector<vector<int>> combinationSum(vector<int> &candidates, int target)
+    {
+        vector<vector<int>> ans;
+        vector<int> ds;
+        findCombination(0, target, candidates, ans, ds);
+        return ans;
+    }
+
+    void findCombination2(int index, int target, vector<int> &nums,
+                          vector<vector<int>> &ans, vector<int> &ds)
+    {
+        if (target == 0)
+        {
+            ans.push_back(ds);
+            return;
+        }
+
+        for (int i = index; i < nums.size(); i++)
+        {
+            if (i > index && nums[i] == nums[i - 1])
+                continue;
+
+            if (nums[i] > target)
+                break;
+
+            ds.push_back(nums[i]);
+            findCombination2(i + 1, target - nums[i], nums, ans, ds);
+            ds.pop_back();
+        }
+    }
+
+    /* @description: find all unique combinations in candidates where the candidate numbers sum to target. Each number in candidates mayonly be used once in the combination.
+     * @param {vector<int>} candidates - input set of candidate numbers
+     * @param {int} target - target sum
+     * @return {vector<vector<int>>} - list of all unique combinations
+     * @time complexity: O(2^t * k) where t is target and k is average length of combination
+     * @space complexity: O(k*x), where x is the number of combinations and k is their average length.
+     */
+    vector<vector<int>> combinationSum2(vector<int> &candidates, int target)
+    {
+        vector<vector<int>> ans;
+        vector<int> ds;
+        sort(candidates.begin(), candidates.end());
+        findCombination2(0, target, candidates, ans, ds);
+        return ans;
+    }
 };
 
 int main()
