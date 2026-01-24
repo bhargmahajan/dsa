@@ -100,8 +100,7 @@ public:
         return res;
     }
 
-    void helper(vector<int> &nums, int index, vector<int> &curr,
-                vector<vector<int>> &result)
+    void helper(vector<int> &nums, int index, vector<int> &curr, vector<vector<int>> &result)
     {
         if (index == nums.size())
         {
@@ -129,8 +128,7 @@ public:
         return res;
     }
 
-    void findCombination(int index, int target, vector<int> &nums,
-                         vector<vector<int>> &ans, vector<int> &ds)
+    void findCombination(int index, int target, vector<int> &nums, vector<vector<int>> &ans, vector<int> &ds)
     {
         if (index == nums.size())
         {
@@ -164,8 +162,7 @@ public:
         return ans;
     }
 
-    void findCombination2(int index, int target, vector<int> &nums,
-                          vector<vector<int>> &ans, vector<int> &ds)
+    void findCombination2(int index, int target, vector<int> &nums, vector<vector<int>> &ans, vector<int> &ds)
     {
         if (target == 0)
         {
@@ -187,7 +184,8 @@ public:
         }
     }
 
-    /* @description: find all unique combinations in candidates where the candidate numbers sum to target. Each number in candidates mayonly be used once in the combination.
+    /*
+    @description: find all unique combinations in candidates where the candidate numbers sum to target. Each number in candidates mayonly be used once in the combination.
      * @param {vector<int>} candidates - input set of candidate numbers
      * @param {int} target - target sum
      * @return {vector<vector<int>>} - list of all unique combinations
@@ -202,6 +200,107 @@ public:
         findCombination2(0, target, candidates, ans, ds);
         return ans;
     }
+
+    void helperSubset(vector<int> &nums, int index, vector<int> &curr,
+                      vector<vector<int>> &result)
+    {
+        result.push_back(curr);
+
+        for (int i = index; i < nums.size(); i++)
+        {
+            if (i > index && nums[i] == nums[i - 1])
+                continue;
+
+            curr.push_back(nums[i]);
+            helperSubset(nums, i + 1, curr, result);
+            curr.pop_back();
+        }
+    }
+
+    /*
+     * @description: generate all possible subsets of a set of integers that may contain duplicates
+     * @param {vector<int>} nums - input set of integers that may contain duplicates
+     * @return {vector<vector<int>>} - list of all possible subsets
+     * @time complexity: O(2^n)
+     * @space complexity: O(n) for storing the result
+     */
+    vector<vector<int>> subsetsWithDup(vector<int> &nums)
+    {
+        vector<vector<int>> res;
+        vector<int> curr;
+        sort(nums.begin(), nums.end());
+        helperSubset(nums, 0, curr, res);
+        return res;
+    }
+
+    void findCombination3(int index, int target, int k, vector<vector<int>> &ans, vector<int> &ds)
+    {
+        if (target == 0 && ds.size() == k)
+        {
+            ans.push_back(ds);
+            return;
+        }
+
+        if (target <= 0 || ds.size() > k)
+            return;
+
+        for (int i = index; i <= 9; i++)
+        {
+            if (i <= target)
+            {
+                ds.push_back(i);
+                findCombination3(i + 1, target - i, k, ans, ds);
+                ds.pop_back();
+            }
+            else
+                break;
+        }
+    }
+
+    /*
+     * @description: find all possible combinations of k numbers that add up to a number n, given that only numbers from 1 to 9 can be used and each combination should be a unique set of numbers
+     * @param {int} k - number of elements in each combination
+     * @param {int} n - target sum
+     * @return {vector<vector<int>>} - list of all unique combinations
+     * @time complexity: O(2^9 * k)
+     * @space complexity: O(k) for storing the current combination
+     */
+    vector<vector<int>> combinationSum3(int k, int n)
+    {
+        vector<vector<int>> ans;
+        vector<int> ds;
+        findCombination3(1, n, k, ans, ds);
+        return ans;
+    }
+
+    void func(int ind, string digits, string s, vector<string> &ans, string combos[])
+    {
+        if (ind == digits.size())
+        {
+            ans.push_back(s);
+            return;
+        }
+
+        int digit = digits[ind] - '0';
+        for (int i = 0; i < combos[digit].size(); i++)
+            func(ind + 1, digits, s + combos[digit][i], ans, combos);
+    }
+
+    /*
+     * @description: generate all possible letter combinations that the number could represent on a phone keypad
+     * @param {string} digits - input string of digits
+     * @return {vector<string>} - list of all possible letter combinations
+     * @time complexity: O(4^n*n) where n is the number of digits mapping to 3 letters and m is the number of digits mapping to 4 letters
+     * @space complexity: O(n) for storing the result
+     */
+    vector<string> letterCombinations(string digits)
+    {
+        string combos[] = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        vector<string> ans;
+        string s = "";
+        func(0, digits, s, ans, combos);
+        return ans;
+    }
 };
 
 int main()
@@ -210,10 +309,7 @@ int main()
     double x = 2.0;
     int n = 10;
 
-    // Calculate x raised to n
     double result = sol.myPow(x, n);
-
-    // Print the result
     std::cout << x << "^" << n << " = " << result << std::endl;
 
     return 0;
