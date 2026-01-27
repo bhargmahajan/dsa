@@ -301,6 +301,142 @@ public:
         func(0, digits, s, ans, combos);
         return ans;
     }
+
+    bool isPalindrome(string &s, int start, int end)
+    {
+        while (start < end)
+        {
+            if (s[start] != s[end])
+                return false;
+
+            start++;
+            end--;
+        }
+
+        return true;
+    }
+
+    void backtrack(int index, string &s, vector<string> &path, vector<vector<string>> &res)
+    {
+        if (index == s.length())
+        {
+            res.push_back(path);
+            return;
+        }
+
+        for (int i = index; i < s.length(); i++)
+        {
+            if (isPalindrome(s, index, i))
+            {
+                path.push_back(s.substr(index, i - index + 1));
+                backtrack(i + 1, s, path, res);
+                path.pop_back();
+            }
+        }
+    }
+
+    /*
+     * @description: partition a string such that every substring of the partition is a palindrome
+     * @param {string} s - input string
+     * @return {vector<vector<string>>} - list of all possible palindrome partitions
+     * @time complexity: O(n * 2^n)
+     * @space complexity: O(2^N * N) + O(N) for storing the current partition
+     */
+    vector<vector<string>> partition(string s)
+    {
+        vector<vector<string>> res;
+        vector<string> path;
+        backtrack(0, s, path, res);
+        return res;
+    }
+
+    bool dfs(vector<vector<char>> &board, string &word, int i, int j, int idx)
+    {
+        if (idx == word.size())
+            return true;
+
+        if (i < 0 || j < 0 || i >= board.size() || j >= board[0].size() ||
+            board[i][j] != word[idx])
+            return false;
+
+        char temp = board[i][j];
+        board[i][j] = '#';
+        bool found = dfs(board, word, i + 1, j, idx + 1) ||
+                     dfs(board, word, i - 1, j, idx + 1) ||
+                     dfs(board, word, i, j + 1, idx + 1) ||
+                     dfs(board, word, i, j - 1, idx + 1);
+        board[i][j] = temp;
+
+        return found;
+    }
+
+    /*
+     * @description: determine if a given word exists in a 2D board of characters
+     * @param {vector<vector<char>>} board - 2D board of characters
+     * @param {string} word - target word to search for
+     * @return {bool} - true if the word exists in the board, false otherwise
+     * @time complexity: O(m * n * 4^L) where N is the number of cells in the board and L is the length of the word
+     * @space complexity: O(L) for the recursion stack
+     */
+    bool exist(vector<vector<char>> &board, string word)
+    {
+        int r = board.size(), c = board[0].size();
+
+        for (int i = 0; i < r; i++)
+        {
+            for (int j = 0; j < c; j++)
+            {
+                if (dfs(board, word, i, j, 0))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    void solve(int col, vector<string> &board, int n, vector<int> &leftRow, vector<int> &upperDiagonal, vector<int> &lowerDiagonal, vector<vector<string>> &ans)
+    {
+        if (col == n)
+        {
+            ans.push_back(board);
+            return;
+        }
+
+        for (int r = 0; r < n; r++)
+        {
+            if (leftRow[r] == 0 && lowerDiagonal[r + col] == 0 && upperDiagonal[n - 1 + col - r] == 0)
+            {
+                board[r][col] = 'Q';
+                leftRow[r] = 1;
+                lowerDiagonal[r + col] = 1;
+                upperDiagonal[n - 1 + col - r] = 1;
+
+                solve(col + 1, board, n, leftRow, upperDiagonal, lowerDiagonal, ans);
+
+                board[r][col] = '.';
+                leftRow[r] = 0;
+                lowerDiagonal[r + col] = 0;
+                upperDiagonal[n - 1 + col - r] = 0;
+            }
+        }
+    }
+
+    /*
+     * @description: solve the N-Queens problem and return all distinct solutions
+     * @param {int} n - size of the chessboard and number of queens
+     * @return {vector<vector<string>>} - list of all distinct solutions
+     * @time complexity: O(N!)
+     * @space complexity: O(N) for storing the board and auxiliary arrays
+     */
+    vector<vector<string>> solveNQueens(int n)
+    {
+        vector<vector<string>> ans;
+        vector<string> board(n, string(n, '.'));
+        vector<int> leftRow(n, 0), upperDiagonal(2 * n - 1, 0), lowerDiagonal(2 * n - 1, 0);
+        solve(0, board, n, leftRow, upperDiagonal, lowerDiagonal, ans);
+
+        return ans;
+    }
 };
 
 int main()
