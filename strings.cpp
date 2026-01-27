@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <unordered_map>
+#include <unordered_set>
 #include <climits>
 
 using namespace std;
@@ -367,6 +368,39 @@ public:
             }
         }
         return sum;
+    }
+
+    /*
+     * @description: determine if the input string can be segmented into a space-separated sequence of one or more dictionary words
+     * @param {string} s - input string
+     * @param {vector<string>} wordDict - list of dictionary words
+     * @return {bool} - true if the string can be segmented, false otherwise
+     * @time complexity: O(n \* m)
+     * @space complexity: O(n) for the dp array
+     */
+    bool wordBreak(string s, vector<string> &wordDict)
+    {
+        int n = s.length(), maxL = 0;
+        unordered_set<string> dict(wordDict.begin(), wordDict.end());
+        vector<bool> dp(n + 1, false);
+        dp[0] = true;
+
+        for (auto x : wordDict)
+            maxL = max(maxL, (int)x.size());
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = max(0, i - maxL); j < i; j++)
+            {
+                if (dp[j] && dict.find(s.substr(j, i - j)) != dict.end())
+                {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+
+        return dp[n];
     }
 };
 
