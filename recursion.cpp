@@ -437,16 +437,90 @@ public:
 
         return ans;
     }
+
+    bool isValid(vector<vector<char>> &board, int row, int col, char c)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            if (board[row][i] == c)
+                return false;
+
+            if (board[i][col] == c)
+                return false;
+
+            if (board[3 * (row / 3) + i / 3][3 * (col / 3) + i % 3] == c)
+                return false;
+        }
+
+        return true;
+    }
+
+    bool solve(vector<vector<char>> &board)
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                if (board[i][j] == '.')
+                {
+                    for (char c = '1'; c <= '9'; c++)
+                    {
+                        if (isValid(board, i, j, c))
+                        {
+                            board[i][j] = c;
+
+                            if (solve(board))
+                                return true;
+
+                            board[i][j] = '.';
+                        }
+                    }
+
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /*
+     * @description: solve a given 9x9 Sudoku puzzle
+     * @param {vector<vector<char>>} board - 2D board representing the Sudoku puzzle, where empty cells are denoted by '.'
+     * @return {void} - modifies the input board in-place to solve the puzzle
+     * @time complexity: O(9^(m*n)) where m and n are the dimensions of the board (in this case, 9x9)
+     * @space complexity: O(1) for the board itself, but O(m*n) for the recursion stack in the worst case
+     */
+    void solveSudoku(vector<vector<char>> &board) { solve(board); }
 };
 
 int main()
 {
     Recursion sol;
-    double x = 2.0;
-    int n = 10;
+    // double x = 2.0;
+    // int n = 10;
 
-    double result = sol.myPow(x, n);
-    std::cout << x << "^" << n << " = " << result << std::endl;
+    // double result = sol.myPow(x, n);
+    // std::cout << x << "^" << n << " = " << result << std::endl;
+
+    vector<vector<char>> board{
+        {'9', '5', '7', '.', '1', '3', '.', '8', '4'},
+        {'4', '8', '3', '.', '5', '7', '1', '.', '6'},
+        {'.', '1', '2', '.', '4', '9', '5', '3', '7'},
+        {'1', '7', '.', '3', '.', '4', '9', '.', '2'},
+        {'5', '.', '4', '9', '7', '.', '3', '6', '.'},
+        {'3', '.', '9', '5', '.', '8', '7', '.', '1'},
+        {'8', '4', '5', '7', '9', '.', '6', '1', '3'},
+        {'.', '9', '1', '.', '3', '6', '.', '7', '5'},
+        {'7', '.', '6', '1', '8', '5', '4', '.', '9'}};
+
+    sol.solveSudoku(board);
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+            cout << board[i][j] << " ";
+        cout << "\n";
+    }
 
     return 0;
 }
