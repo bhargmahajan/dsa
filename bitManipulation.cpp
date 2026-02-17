@@ -60,6 +60,27 @@ public:
         return sign * ans;
     }
 
+    /*
+        @description: This function returns the minimum number of bit flips required to convert start to goal.
+        @param: start - the starting number.
+                goal - the target number.
+        @return: the minimum number of bit flips required to convert start to goal.
+        Time Complexity: O(1)
+        Space Complexity: O(1)
+    */
+    int minBitFlips(int start, int goal)
+    {
+        int cnt = 0, xr = start ^ goal;
+
+        for (int i = 0; i < 32; i++)
+        {
+            cnt += xr & 1;
+            xr = xr >> 1;
+        }
+
+        return cnt;
+    }
+
     ~bitManipulation();
 };
 
