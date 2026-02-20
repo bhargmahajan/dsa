@@ -17,6 +17,13 @@ class MinStack
 public:
     MinStack() {}
 
+    /*
+        @description: Pushes an element onto the stack.
+        @param: val - The element to be pushed onto the stack.
+        @return: void
+        Time Complexity: O(1)
+        Space Complexity: O(1)
+    */
     void push(int val)
     {
         if (st.empty())
@@ -38,6 +45,12 @@ public:
         }
     }
 
+    /*
+        @description: Removes the element on top of the stack and returns that element.
+        @return: void
+        Time Complexity: O(1)
+        Space Complexity: O(1)
+    */
     void pop()
     {
         if (st.empty())
@@ -47,6 +60,12 @@ public:
         st.pop();
     }
 
+    /*
+        @description: Get the top element of the stack.
+        @return: The top element of the stack.
+        Time Complexity: O(1)
+        Space Complexity: O(1)
+    */
     int top()
     {
         if (st.empty())
@@ -58,6 +77,12 @@ public:
         return mini;
     }
 
+    /*
+        @description: Retrieves the minimum element in the stack.
+        @return: The minimum element in the stack.
+        Time Complexity: O(1)
+        Space Complexity: O(1)
+    */
     int getMin() { return mini; }
 };
 
