@@ -402,6 +402,156 @@ public:
 
         return ans;
     }
+
+    /*
+        @description: Calculates the total amount of rainwater that can be trapped between the bars represented by the input vector.
+        @param: height - The input vector of integers representing the height of the bars.
+        @return: The total amount of rainwater that can be trapped.
+        Time Complexity: O(n) where n is the number of elements in the input vector.
+        Space Complexity: O(1) as we are using only a constant amount of extra space.
+    */
+    int trap(vector<int> &height)
+    {
+        int res = 0, left = 0, right = height.size() - 1;
+        int leftMax = 0, rightMax = 0;
+
+        while (left < right)
+        {
+            if (height[left] <= height[right])
+            {
+                if (height[left] >= leftMax)
+                    leftMax = height[left];
+                else
+                    res += leftMax - height[left];
+                left++;
+            }
+            else
+            {
+                if (height[right] >= rightMax)
+                    rightMax = height[right];
+                else
+                    res += rightMax - height[right];
+                right--;
+            }
+        }
+
+        return res;
+    }
+
+    /*
+        @description: Simulates the collision of asteroids represented by the input vector and returns the state of the asteroids after all collisions.
+        @param: asteroids - The input vector of integers representing the asteroids, where positive values indicate asteroids moving to the right and negative values indicate asteroids moving to the left.
+        @return: A vector of integers representing the state of the asteroids after all collisions.
+        Time Complexity: O(n) where n is the number of elements in the input vector.
+        Space Complexity: O(n) in the worst case when all asteroids are moving in the same direction and do not collide.
+    */
+    vector<int> asteroidCollision(vector<int> &asteroids)
+    {
+        vector<int> res;
+
+        for (int i = 0; i < asteroids.size(); i++)
+        {
+            if (asteroids[i] > 0)
+                res.push_back(asteroids[i]);
+            else
+            {
+                while (!res.empty() && res.back() > 0 &&
+                       res.back() < abs(asteroids[i]))
+                    res.pop_back();
+
+                if (!res.empty() && res.back() == abs(asteroids[i]))
+                    res.pop_back();
+                else if (res.empty() || res.back() < 0)
+                    res.push_back(asteroids[i]);
+            }
+        }
+
+        return res;
+    }
+
+    /*
+        @description: Removes k digits from the given number string to make the smallest possible number.
+        @param: num - The input string representing a number.
+        @param: k - The number of digits to remove.
+        @return: The smallest possible number after removing k digits.
+        Time Complexity: O(n) where n is the length of the input string.
+        Space Complexity: O(n) for the stack used to store digits.
+    */
+    string removeKdigits(string num, int k)
+    {
+        stack<int> st;
+
+        for (int i = 0; i < num.size(); i++)
+        {
+            char c = num[i];
+
+            while (!st.empty() && k > 0 && st.top() > c)
+            {
+                st.pop();
+                k--;
+            }
+
+            st.push(c);
+        }
+
+        while (!st.empty() && k > 0)
+        {
+            st.pop();
+            k--;
+        }
+
+        string res = "";
+        while (!st.empty())
+        {
+            res += st.top();
+            st.pop();
+        }
+
+        while (res.size() > 0 && res.back() == '0')
+            res.pop_back();
+
+        reverse(res.begin(), res.end());
+
+        if (res.empty())
+            return "0";
+
+        return res;
+    }
+
+    /*
+        @description: Calculates the largest rectangle area in a histogram.
+        @param: heights - The input vector of integers representing the heights of bars in a histogram.
+        @return: The maximum area of a rectangle in the histogram.
+        Time Complexity: O(n) where n is the number of elements in the input vector.
+        Space Complexity: O(n) for the stack used to store indices.
+    */
+    int largestRectangleArea(vector<int> &heights)
+    {
+        int left[heights.size()], right[heights.size()], maxRect = 0;
+        stack<int> st;
+        int n = heights.size();
+
+        for (int i = 0; i <= n; i++)
+        {
+            while (!st.empty() && (i == n || heights[st.top()] >= heights[i]))
+            {
+                int h = heights[st.top()];
+                st.pop();
+
+                int w;
+                if (st.empty())
+                    w = i;
+                else
+                    w = i - st.top() - 1;
+
+                maxRect = max(maxRect, w * h);
+            }
+
+            st.push(i);
+        }
+
+        return maxRect;
+    }
 };
 
 int main()
