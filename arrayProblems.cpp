@@ -393,6 +393,96 @@ public:
     */
     bool searchMatrix(vector<vector<int>> &matrix, int target);
 
+    /*
+        Function to find the length of the longest substring without repeating characters
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int lengthOfLongestSubstring(string s)
+    {
+        int maxL = 0, i = 0, j = 0;
+        int hash[256];
+
+        for (int i = 0; i < 256; ++i)
+        {
+            hash[i] = -1;
+        }
+
+        while (j < s.size())
+        {
+            if (hash[s[j]] != -1)
+                i = max(i, hash[s[j]] + 1);
+
+            maxL = max(maxL, j - i + 1);
+            hash[s[j]] = j;
+            j++;
+        }
+
+        return maxL;
+    }
+
+    /*
+        Function to find the length of the longest subarray with at most k zeroes
+        @param nums: input array of 0s and 1s
+        @param k: maximum number of zeroes allowed in the subarray
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int longestOnes(vector<int> &nums, int k)
+    {
+        int maxL = 0, i = 0;
+        int zeroes = 0;
+
+        for (int j = 0; j < nums.size(); j++)
+        {
+            if (nums[j] == 0)
+                zeroes++;
+
+            if (zeroes > k)
+            {
+                if (nums[i] == 0)
+                {
+                    zeroes--;
+                }
+                i++;
+            }
+
+            maxL = max(maxL, j - i + 1);
+        }
+
+        return maxL;
+    }
+
+    /*
+        Function to find the length of the longest substring with same characters after replacing at most k characters
+        @param s: input string
+        @param k: maximum number of characters allowed to be replaced
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int characterReplacement(string s, int k)
+    {
+        vector<int> freq(26, 0);
+        int i = 0, j = 0, maxL = 0, maxC;
+
+        while (j < s.size())
+        {
+            freq[s[j] - 'A']++;
+            maxC = max(maxC, freq[s[j] - 'A']);
+
+            while ((j - i + 1) - maxC > k)
+            {
+                freq[s[i] - 'A']--;
+                i++;
+            }
+
+            maxL = max(maxL, j - i + 1);
+            j++;
+        }
+
+        return maxL;
+    }
+
     ~ArrayProblems();
 };
 
@@ -1867,138 +1957,5 @@ ArrayProblems::~ArrayProblems()
 
 int main()
 {
-    int arr[10] = {3, 1, 2, -5, 2, -4};
-    int n = 6;
-
-    int arr2[10] = {2, 3, 4, 4, 5, 11, 12};
-    int n2 = 7;
-
-    vector<int> nums = {3, 4, 5, 1, 2};
-    vector<int> nums2 = {2, 4, 6, 8};
-    vector<int> nums1 = {1, 2, 3, 0, 0, 0, 0};
-
-    vector<vector<int>> matrix = {{0, 1, 2, 0}, {3, 4, 5, 2}, {1, 3, 1, 5}};
-
-    ArrayProblems obj1(arr, n, arr2, n2);
-
-    // cout << "Maximum element is: " << obj1.findMax() << endl;
-    // cout << "Second Maximum element is: " << obj1.findSecondMax() << endl;
-    // bool sorted = obj1.checkIfSorted();
-    // if (sorted)
-    //     cout << "The array is sorted." << endl;
-    // else
-    //     cout << "The array is not sorted." << endl;
-
-    // obj1.removeDuplicatesSortedArray();
-    // obj1.removeDuplicatesUnsortedArray();
-    // obj1.rotateByOnePlace();
-    // obj1.rotateByKPlace(9);
-    // obj1.moveZeros();
-    // obj1.unionSortedArray();
-    // cout << "Missing element in sorted array is: " << obj1.missingNumberInSortedArray() << endl;
-    // cout << "Missing element in unsorted array is: " << obj1.missingNumberInUnsortedArray() << endl;
-    // cout << "Maximum number of consecutive ones is: " << obj1.consecutiveOnes() << endl;
-    // cout << "Single element is: " << obj1.singleElement() << endl;
-    // cout << "Lenght of longest subarray: " << obj1.longestSubarrayWithKSum(5) << endl;
-    // cout << "Indices of elements whose sum is: " << obj1.targetSum(6).first << ", " << obj1.targetSum(6).second << endl;
-    // obj1.sortOnesTwosAndZeroes();
-    // cout << "Majority element: " << obj1.majorityElement() << endl;
-    // cout << "Maximum sum for subarray: " << obj1.maxSumForSubarray() << endl;
-    // cout << "Maximum profit from stock prices: " << obj1.maxProfit() << endl;
-    // cout << "Array rearranged in alternate positive and negative items: "<<endl;
-    // obj1.alternativePosNeg();
-    // // obj1.nextPermutation(nums);
-    // vector<int> leaders = obj1.leaders(nums);
-    // cout << "Leaders in the array are: ";
-    // for (int i = 0; i < leaders.size(); i++)
-    //     cout << leaders[i] << " ";
-    // cout << endl;
-    // obj1.setZeroes(matrix);
-    // for (auto row : matrix)
-    // {
-    //     for (auto val : row)
-    //     {
-    //         cout << val << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << "Length of longest consecutive elements sequence is: " << obj1.longestConsecutive(nums) << endl;
-    // cout << "Matrix after rotating by 90 degrees clockwise:" << endl;
-    // obj1.rotateByNinty(matrix);
-    // for (auto row : matrix)
-    // {
-    //     for (auto val : row)
-    //         cout << val << " ";
-    //     cout << endl;
-    // }
-    // cout << "Spiral order of the matrix is: ";
-    // vector<int> spiral = obj1.spiralOrder(matrix);
-    // for (auto val : spiral)
-    //     cout << val << " ";
-    // cout << endl;
-    // cout << "Total number of subarrays with sum equal to k is: " << obj1.subarraySum(nums, 5) << endl;
-    // vector<vector<int>> pascal = obj1.pascalTriangle(5);
-    // cout << "Pascal's Triangle:" << endl;
-    // for(auto row : pascal)
-    // {
-    //     for (auto val : row)
-    //         cout << val << " ";
-    //     cout << endl;
-    // }
-    // for (auto val : obj1.majorityElement(nums))
-    //     cout << val << " ";
-    // cout << endl;
-    // vector<vector<int>> triplets = obj1.threeSum(nums);
-    // cout << "Unique triplets in the array which gives the sum of zero are: " << endl;
-    // for (auto row : triplets)
-    // {
-    //     for (auto val : row)
-    //         cout << val << " ";
-    //     cout << endl;
-    // }
-    // vector<vector<int>> quadret = obj1.fourSum(nums, 2);
-    // cout << "Unique quardlets in the array which gives the target sum are: " << endl;
-    // for (auto row : quadret)
-    // {
-    //     for (auto val : row)
-    //         cout << val << " ";
-    //     cout << endl;
-    // }
-    // cout << "Length of longest subarray with sum zero is: " << obj1.subArraySum(nums) << endl;
-    // cout << "Total subarrays with given xor is: " << obj1.subArrayXor(nums, 2) << endl;
-    // vector<vector<int>> intervals = {{1, 3}, {2, 4}, {5, 7}, {6, 8}};
-    // vector<vector<int>> mergedIntervals = obj1.mergeIntervals(intervals);
-    // cout << "Merged Intervals are: " << endl;
-    // for (auto row : mergedIntervals)
-    // {
-    //     for (auto val : row)
-    //         cout << val << " ";
-    //     cout << endl;
-    // }
-    // cout << "Merged sorted array is: " << endl;
-    // obj1.mergeArrays(nums1, nums1.size() - nums2.size(), nums2, nums2.size());
-    // for (auto val : nums1)
-    //     cout << val << " ";
-    // cout << endl;
-    // vector<int> ar = obj1.repeatingAndMissingNumber(nums);
-    // cout << "Missing number is: " << ar[1] << ", Repeating number is: " << ar[0] << endl;
-    // cout << "Total inversions in the array are: " << obj1.inversions(nums, 0, nums.size() - 1) << endl;
-    // cout << "Total reverse pairs in the array are: " << reversePairs(nums) << endl;
-    // cout << "Maximum product subarray is: " << obj1.maxProduct(nums) << endl;
-    // cout << "Lower bound array is: " << obj1.lowerBound(nums, 6) << endl;
-    // cout << "Upper bound array is: " << obj1.upperBound(nums, 9) << endl;
-    // cout << "Floor and Ceil indices are: " << obj1.floorAndCeil(nums, 5)[0] << ", " << obj1.floorAndCeil(nums, 5)[1] << endl;
-    // cout << "First and Last indices are: " << obj1.searchRange(nums, 4)[0] << ", " << obj1.searchRange(nums, 4)[1] << endl;
-    // cout << "Frequency of target element is: " << obj1.frequency(nums, 3) << endl;
-    // cout<< "Index of target element in rotated sorted array is: " << obj1.searchInRotatedArrayOne(nums, 3) << endl;
-    // cout << "Minimum element in rotated sorted array is: " << obj1.findMin(nums) << endl;
-    // cout << "Rotation count of rotated sorted array is: " << obj1.rotationCount(nums) << endl;
-    // cout << "Single element in sorted array is: " << obj1.singleNonDuplicate(nums) << endl;
-    // cout << "Peak element in the array is at index: " << obj1.findPeakElement(nums) << endl;
-    // cout << "Square root of the number is: " << obj1.squareRoot(4) << endl;
-    // cout << "Nth root of the number is: " << obj1.nthRoot(4, 69) << endl;
-    // cout << "Minimum eating speed to finish the piles in given hours is: " << obj1.minEatingSpeed(nums2, 8) << endl;
-    cout << "Minimum days to make m bouquets is: " << obj1.minDays(nums2, 3, 6) << endl;
-
     return 0;
 }
