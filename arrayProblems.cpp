@@ -394,34 +394,6 @@ public:
     bool searchMatrix(vector<vector<int>> &matrix, int target);
 
     /*
-        Function to find the length of the longest substring without repeating characters
-        Time Complexity: O(n)
-        Space Complexity: O(1)
-    */
-    int lengthOfLongestSubstring(string s)
-    {
-        int maxL = 0, i = 0, j = 0;
-        int hash[256];
-
-        for (int i = 0; i < 256; ++i)
-        {
-            hash[i] = -1;
-        }
-
-        while (j < s.size())
-        {
-            if (hash[s[j]] != -1)
-                i = max(i, hash[s[j]] + 1);
-
-            maxL = max(maxL, j - i + 1);
-            hash[s[j]] = j;
-            j++;
-        }
-
-        return maxL;
-    }
-
-    /*
         Function to find the length of the longest subarray with at most k zeroes
         @param nums: input array of 0s and 1s
         @param k: maximum number of zeroes allowed in the subarray
@@ -453,34 +425,138 @@ public:
         return maxL;
     }
 
-    /*
-        Function to find the length of the longest substring with same characters after replacing at most k characters
-        @param s: input string
-        @param k: maximum number of characters allowed to be replaced
-        Time Complexity: O(n)
-        Space Complexity: O(1)
-    */
-    int characterReplacement(string s, int k)
+    int atMost(vector<int> &nums, int k)
     {
-        vector<int> freq(26, 0);
-        int i = 0, j = 0, maxL = 0, maxC;
+        if (k < 0)
+            return 0;
 
-        while (j < s.size())
+        int i = 0, sum = 0, cnt = 0;
+
+        for (int j = 0; j < nums.size(); j++)
         {
-            freq[s[j] - 'A']++;
-            maxC = max(maxC, freq[s[j] - 'A']);
+            sum += nums[j];
 
-            while ((j - i + 1) - maxC > k)
+            while (sum > k)
             {
-                freq[s[i] - 'A']--;
+                sum -= nums[i];
                 i++;
             }
 
-            maxL = max(maxL, j - i + 1);
-            j++;
+            cnt += (j - i + 1);
         }
 
-        return maxL;
+        return cnt;
+    }
+
+    /*
+        @description: Function to find the total number of subarrays with sum equal to goal
+        @param nums: input array
+        @param goal: target sum
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int numSubarraysWithSum(vector<int> &nums, int goal)
+    {
+        return atMost(nums, goal) - atMost(nums, goal - 1);
+    }
+
+    int countAtMost(vector<int> &nums, int k)
+    {
+        if (k < 0)
+            return 0;
+
+        int i = 0, res = 0;
+
+        for (int j = 0; j < nums.size(); j++)
+        {
+            if (nums[j] % 2 != 0)
+                k--;
+
+            while (0 > k)
+            {
+                if (nums[i] % 2 != 0)
+                    k++;
+                i++;
+            }
+
+            res += (j - i + 1);
+        }
+
+        return res;
+    }
+
+    /*
+        @description: Function to find the total number of subarrays with number of odd elements equal to k
+        @param nums: input array
+        @param k: target number of odd elements
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int numberOfSubarrays(vector<int> &nums, int k)
+    {
+        return countAtMost(nums, k) - countAtMost(nums, k - 1);
+    }
+
+    /*
+        @description: Function to find the maximum score from card points by taking k cards from either end
+        @param cardPoints: input array of card points
+        @param k: number of cards to take
+        Time Complexity: O(k)
+        Space Complexity: O(1)
+    */
+    int maxScore(vector<int> &cardPoints, int k)
+    {
+        int res = 0, total = 0, n = cardPoints.size() - 1;
+
+        for (int i = 0; i < k; i++)
+            total += cardPoints[i];
+
+        res = total;
+        for (int i = 0; i < k; i++)
+        {
+            total -= cardPoints[k - 1 - i];
+            total += cardPoints[n - i];
+            res = max(res, total);
+        }
+
+        return res;
+    }
+
+    int atMost(vector<int> &nums, int k)
+    {
+        unordered_map<int, int> freq;
+        int i = 0, cnt = 0;
+
+        for (int j = 0; j < nums.size(); j++)
+        {
+            if (freq[nums[j]] == 0)
+                k--;
+            freq[nums[j]]++;
+
+            while (0 > k)
+            {
+                freq[nums[i]]--;
+                if (freq[nums[i]] == 0)
+                    k++;
+                i++;
+            }
+
+            cnt += (j - i + 1);
+        }
+
+        return cnt;
+    }
+
+    /*
+        @description: Function to find the total number of subarrays with exactly k distinct integers
+        @param nums: input array
+        @param k: target number of distinct integers
+        Time Complexity: O(n)
+        Space Complexity: O(k)
+    */
+    int subarraysWithKDistinct(vector<int> &nums, int k)
+    {
+        return atMost(nums, k) - atMost(nums, k - 1);
     }
 
     ~ArrayProblems();
