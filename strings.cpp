@@ -402,6 +402,90 @@ public:
 
         return dp[n];
     }
+
+    /*
+        Function to find the length of the longest substring without repeating characters
+        @param s: input string
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int lengthOfLongestSubstring(string s)
+    {
+        int maxL = 0, i = 0, j = 0;
+        int hash[256];
+
+        for (int i = 0; i < 256; ++i)
+        {
+            hash[i] = -1;
+        }
+
+        while (j < s.size())
+        {
+            if (hash[s[j]] != -1)
+                i = max(i, hash[s[j]] + 1);
+
+            maxL = max(maxL, j - i + 1);
+            hash[s[j]] = j;
+            j++;
+        }
+
+        return maxL;
+    }
+
+    /*
+        Function to find the length of the longest substring with same characters after replacing at most k characters
+        @param s: input string
+        @param k: maximum number of characters allowed to be replaced
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int characterReplacement(string s, int k)
+    {
+        vector<int> freq(26, 0);
+        int i = 0, j = 0, maxL = 0, maxC;
+
+        while (j < s.size())
+        {
+            freq[s[j] - 'A']++;
+            maxC = max(maxC, freq[s[j] - 'A']);
+
+            while ((j - i + 1) - maxC > k)
+            {
+                freq[s[i] - 'A']--;
+                i++;
+            }
+
+            maxL = max(maxL, j - i + 1);
+            j++;
+        }
+
+        return maxL;
+    }
+
+    /*
+        @description: Function to find the total number of substrings containing all three characters
+        @param s: input string
+        Time Complexity: O(n)
+        Space Complexity: O(1)
+    */
+    int numberOfSubstrings(string s)
+    {
+        vector<int> freq(3, 0);
+        int res = 0, i = 0;
+
+        for (int j = 0; j < s.length(); j++)
+        {
+            freq[s[j] - 'a']++;
+
+            while (freq[0] > 0 && freq[1] > 0 && freq[2] > 0)
+            {
+                res += (s.length() - j);
+                freq[s[i] - 'a']--;
+                i++;
+            }
+        }
+        return res;
+    }
 };
 
 int main()
