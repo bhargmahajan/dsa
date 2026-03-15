@@ -3,232 +3,212 @@
 using namespace std;
 
 /*
+    @description: structure for a node in a linked list
+*/
+struct ListNode
+{
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+/*
+    @description: comparator class for ListNode pointers to be used in the priority queue
+*/
+class Compare
+{
+public:
+    bool operator()(ListNode *a, ListNode *b) { return a->val > b->val; }
+};
+
+/*
     @description: class to solve heap related problems
 */
 class HeapProblems
 {
 public:
-    int capacity, size, *arr;
-
-    HeapProblems(int cap = 10)
-    {
-        capacity = cap;
-        size = 0;
-        arr = new int[capacity];
-    }
-
     /*
-        @description: return parent of current node
-        @param: i - index of current node
-        @return: index of parent node
-        @time complexity: O(1)
-        @space complexity: O(1)
+        @description: find the kth largest element in the array
+        @param: nums - vector of integers, k - position of the desired largest element
+        @return: kth largest element
+        @time complexity: O(n log k)
+        @space complexity: O(k)
     */
-    int parent(int i)
+    int kthLargestElement(vector<int> &nums, int k)
     {
-        return (i - 1) / 2;
-    }
+        priority_queue<int, vector<int>, greater<int>> minHeap;
 
-    /*
-        @description: swap two elements in the heap
-        @param: x, y - pointers to the elements to be swapped
-        @return: void
-        @time complexity: O(1)
-        @space complexity: O(1)
-    */
-    void swap(int *x, int *y)
-    {
-        int temp = *x;
-        *x = *y;
-        *y = temp;
-    }
+        for (int i = 0; i < k; i++)
+            minHeap.push(nums[i]);
 
-    /*
-        @description: print the elements of the heap
-        @return: void
-        @time complexity: O(n)
-        @space complexity: O(1)
-    */
-    void print()
-    {
-        for (int i = 0; i < size; i++)
-            cout << arr[i] << " ";
-        cout << endl;
-    }
-
-    /*
-        @description: insert an element in the heap
-        @param: x - element to be inserted
-        @return: void
-        @time complexity: O(log n)
-        @space complexity: O(1)
-    */
-    void Insert(int x)
-    {
-        if (size == capacity)
+        for (int i = k; i < nums.size(); i++)
         {
-            cout << "Binary Heap Overflow" << endl;
-            return;
+            if (nums[i] > minHeap.top())
+            {
+                minHeap.pop();
+                minHeap.push(nums[i]);
+            }
         }
 
-        arr[size] = x;
-        int k = size;
-        size++;
+        return minHeap.top();
+    }
 
-        while (k != 0 && arr[parent(k)] < arr[k])
+    /*
+        @description: sort a nearly sorted array using a min heap
+        @param: arr - vector of integers, k - maximum distance an element can be from its sorted position
+        @return: sorted vector of integers
+        @time complexity: O(n log k)
+        @space complexity: O(k)
+    */
+    vector<int> sortNearlySortedArray(vector<int> &arr, int k)
+    {
+        priority_queue<int, vector<int>, greater<int>> minHeap;
+        vector<int> res;
+
+        for (int i = 0; i <= k && i < arr.size(); i++)
+            minHeap.push(arr[i]);
+
+        for (int i = k + 1; i < arr.size(); i++)
         {
-            swap(&arr[parent(k)], &arr[k]);
-            k = parent(k);
-        }
-    }
-
-    /*
-        @description: get the minimum element from the heap
-        @return: minimum element
-        @time complexity: O(1)
-        @space complexity: O(1)
-    */
-    int getMin()
-    {
-        return arr[0];
-    }
-
-    /*
-        @description: return index of left child of current node
-        @param: i - index of current node
-        @return: index of left child node
-        @time complexity: O(1)
-        @space complexity: O(1)
-    */
-    int leftChild(int i)
-    {
-        return 2 * i + 1;
-    }
-
-    /*
-        @description: return index of right child of current node
-        @param: i - index of current node
-        @return: index of right child node
-        @time complexity: O(1)
-        @space complexity: O(1)
-    */
-    int rightChild(int i)
-    {
-        return 2 * i + 2;
-    }
-
-    /*
-        @description: heapify the subtree rooted at index ind
-        @param: ind - index of the root of the subtree to be heapified
-        @return: void
-        @time complexity: O(log n)
-        @space complexity: O(1)
-    */
-    void Heapify(int ind)
-    {
-        int r = rightChild(ind);
-        int l = leftChild(ind);
-        int smallest = ind;
-
-        if (l < size && arr[l] < arr[smallest])
-            smallest = l;
-
-        if (r < size && arr[r] < arr[smallest])
-            smallest = r;
-
-        if (smallest != ind)
-        {
-            swap(&arr[smallest], &arr[ind]);
-            Heapify(smallest);
-        }
-    }
-
-    /*
-        @description: extract the minimum element from the heap
-        @return: minimum element
-        @time complexity: O(log n)
-        @space complexity: O(1)
-    */
-    int ExtractMin()
-    {
-        if (size <= 0)
-            return INT_MAX;
-
-        if (size == 1)
-        {
-            size--;
-            return arr[0];
+            if (arr[i] > minHeap.top())
+            {
+                res.push_back(minHeap.top());
+                minHeap.pop();
+                minHeap.push(arr[i]);
+            }
         }
 
-        int mini = arr[0];
-        arr[0] = arr[size - 1];
-        size--;
-        Heapify(0);
-
-        return mini;
-    }
-
-    /*
-        @description: decrease the value of an element in the heap
-        @param: k - index of the element to be decreased, val - new value of the element
-        @return: void
-        @time complexity: O(log n)
-        @space complexity: O(1)
-    */
-    void Decreasekey(int k, int val)
-    {
-        arr[k] = val;
-        while (k != 0 && arr[parent(k)] < arr[k])
+        while (!minHeap.empty())
         {
-            swap(&arr[parent(k)], &arr[k]);
-            k = parent(k);
+            res.push_back(minHeap.top());
+            minHeap.pop();
         }
+
+        return res;
     }
 
     /*
-        @description: delete an element from the heap
-        @param: i - index of the element to be deleted
-        @return: void
-        @time complexity: O(log n)
-        @space complexity: O(1)
+        @description: merge k sorted linked lists
+        @param: lists - vector of pointers to ListNode
+        @return: pointer to the merged sorted linked list
+        @time complexity: O(N log k)
+        @space complexity: O(k)
     */
-    void Delete(int i)
+    ListNode *mergeKLists(vector<ListNode *> &lists)
     {
-        Decreasekey(i, INT_MIN);
-        ExtractMin();
-    }
+        priority_queue<ListNode *, vector<ListNode *>, Compare> minHeap;
 
-    /*
-        @description: check if the given array represents a min heap
-        @param: nums - vector of integers representing the heap
-        @return: true if the array represents a min heap, false otherwise
-        @time complexity: O(n)
-        @space complexity: O(1)
-    */
-    bool isMinHeap(vector<int> &nums)
-    {
-        int n = nums.size();
-        for (int i = 0; i <= (n / 2) - 1; i++)
+        for (auto x : lists)
         {
-            int l = leftChild(i);
-            if (l < n && nums[i] > nums[l])
-                return false;
-
-            int r = rightChild(i);
-            if (r < n && nums[i] > nums[r])
-                return false;
+            if (x != NULL)
+                minHeap.push(x);
         }
-        return true;
+
+        ListNode *res = new ListNode(0);
+        ListNode *tail = res;
+        while (!minHeap.empty())
+        {
+            ListNode *s = minHeap.top();
+            minHeap.pop();
+            tail->next = s;
+            tail = tail->next;
+
+            if (tail->next)
+                minHeap.push(s->next);
+        }
+
+        return res->next;
+    }
+
+    /*
+        @description: replace each element in the array with its rank
+        @param: arr - vector of integers
+        @return: vector of integers with ranks
+        @time complexity: O(n log n)
+        @space complexity: O(n)
+    */
+    vector<int> replaceWithRank(vector<int> &arr)
+    {
+        vector<int> sortedArr = sortNearlySortedArray(arr, arr.size() - 1);
+        unordered_map<int, int> rankMap;
+        int rank = 1;
+        for (int i = 0; i < sortedArr.size(); i++)
+        {
+            if (rankMap.find(sortedArr[i]) == rankMap.end())
+            {
+                rankMap[sortedArr[i]] = rank;
+                rank++;
+            }
+        }
+
+        for (int i = 0; i < arr.size(); i++)
+            arr[i] = rankMap[arr[i]];
+
+        return arr;
+    }
+
+    /*
+        @description: find the minimum number of intervals required to complete all tasks
+        @param: tasks - vector of characters representing tasks, n - cooldown period
+        @return: minimum number of intervals required
+        @time complexity: O(n log k)
+        @space complexity: O(k)
+    */
+    int leastInterval(vector<char> &tasks, int n)
+    {
+        unordered_map<char, int> freq;
+        for (char c : tasks)
+            freq[c]++;
+
+        priority_queue<int> h;
+        for (auto e : freq)
+            h.push(e.second);
+
+        int time = 0;
+        while (!h.empty())
+        {
+            vector<int> temp;
+            int i = 0, cycle = n + 1;
+
+            while (i < cycle && !h.empty())
+            {
+                int cnt = h.top();
+                h.pop();
+                cnt--;
+
+                if (cnt > 0)
+                    temp.push_back(cnt);
+                time++;
+                i++;
+            }
+
+            for (int val : temp)
+                h.push(val);
+            if (h.empty())
+                break;
+            time += (cycle - i);
+        }
+
+        return time;
     }
 };
 
 int main()
 {
-    HeapProblems h(20);
-    vector<int> nums = {10, 20, 30, 25, 15};
+    HeapProblems h;
+    vector<int> nums = {20, 15, 26, 2, 98, 6};
+    int k = 3;
+    cout << "The " << k << "rd largest element is: " << h.kthLargestElement(nums, k) << endl;
 
-    // Output result
-    cout << (h.isMinHeap(nums) ? "true" : "false") << endl;
+    vector<int> sortedArr = h.sortNearlySortedArray(nums, k);
+
+    for (int num : sortedArr)
+        cout << num << " ";
+
+    cout << endl;
+    vector<int> res = h.replaceWithRank(nums);
+    for (int x : res)
+        cout << x << " ";
 
     return 0;
 }
