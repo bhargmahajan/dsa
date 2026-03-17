@@ -3,6 +3,96 @@
 using namespace std;
 
 /*
+    @description: class to find the kth largest element in a stream of numbers
+*/
+class KthLargest
+{
+    priority_queue<int, vector<int>, greater<int>> h;
+    int r;
+
+public:
+    /**
+     * @description: constructor to initialize the class with k and the initial stream of numbers
+     * @param: k - position of the desired largest element, nums - vector of integers representing the initial stream
+     * @return: void
+     * @time complexity: O(n log k)
+     * @space complexity: O(k)
+     */
+    KthLargest(int k, vector<int> &nums)
+    {
+        r = k;
+        for (auto i : nums)
+        {
+            h.push(i);
+            if (h.size() > k)
+                h.pop();
+        }
+    }
+
+    /**
+     * @description: add a new value to the stream and return the kth largest element
+     * @param: val - new value to be added
+     * @return: kth largest element
+     * @time complexity: O(1)
+     * @space complexity: O(1)
+     */
+    int add(int val)
+    {
+        h.push(val);
+        if (h.size() > r)
+            h.pop();
+
+        return h.top();
+    }
+};
+
+/*
+    @description: class to find the median of a stream of numbers
+*/
+class MedianFinder
+{
+    priority_queue<int> maxh;
+    priority_queue<int, vector<int>, greater<int>> minh;
+
+public:
+    MedianFinder() {}
+
+    /*
+        @description: add a new number to the stream
+        @param: num - new number to be added
+        @return: void
+        @time complexity: O(log n)
+        @space complexity: O(1)
+    */
+    void addNum(int num)
+    {
+        maxh.push(num);
+        minh.push(maxh.top());
+        maxh.pop();
+
+        if (minh.size() > maxh.size())
+        {
+            maxh.push(minh.top());
+            minh.pop();
+        }
+    }
+
+    /*
+        @description: find the median of the current stream of numbers
+        @param: void
+        @return: median value
+        @time complexity: O(1)
+        @space complexity: O(1)
+    */
+    double findMedian()
+    {
+        if (minh.size() == maxh.size())
+            return (minh.top() + maxh.top()) / 2.0;
+        return maxh.top();
+    }
+};
+
+/*
     @description: structure for a node in a linked list
 */
 struct ListNode
@@ -191,24 +281,126 @@ public:
 
         return time;
     }
+
+    /*
+        @description: check if the given hand of cards can be rearranged into groups of consecutive numbers
+        @param: hand - vector of integers representing card values, groupSize - size of each group
+        @return: true if the hand can be rearranged, false otherwise
+        @time complexity: O(n log n)
+        @space complexity: O(n)
+    */
+    bool isNStraightHand(vector<int> &hand, int groupSize)
+    {
+        if (hand.size() % groupSize != 0)
+            return false;
+
+        map<int, int> h;
+        for (auto i : hand)
+            h[i]++;
+
+        auto it = h.begin();
+
+        while (it != h.end())
+        {
+            if (it->second == 0)
+            {
+                ++it;
+                continue;
+            }
+
+            int start = it->first, count = it->second;
+            for (int i = 0; i < groupSize; ++i)
+            {
+                if (h[start + i] < count)
+                    return false;
+
+                h[start + i] -= count;
+            }
+
+            it++;
+        }
+
+        return true;
+    }
+
+    /*
+        @description: find the maximum k combinations of elements from two arrays
+        @param: nums1, nums2 - vectors of integers, k - number of combinations to find
+        @return: vector of integers with maximum k combinations
+        @time complexity: O(k log k)
+        @space complexity: O(k)
+    */
+    vector<int> maxCombinations(vector<int> &nums1, vector<int> &nums2, int k)
+    {
+        sort(nums1.begin(), nums1.end(), greater<int>());
+        sort(nums2.begin(), nums2.end(), greater<int>());
+
+        priority_queue<tuple<int, int, int>> h;
+        set<pair<int, int>> visited;
+        h.push({nums1[0] + nums2[0], 0, 0});
+        visited.insert({0, 0});
+
+        vector<int> res;
+        while (k-- && !h.empty())
+        {
+            int sum = get<0>(h.top());
+            int i = get<1>(h.top());
+            int j = get<2>(h.top());
+
+            h.pop();
+            res.push_back(sum);
+
+            if (i + 1 < nums1.size() && !visited.count({i + 1, j}))
+            {
+                h.push({nums1[i + 1] + nums2[j], i + 1, j});
+                visited.insert({i + 1, j});
+            }
+
+            if (j + 1 < nums2.size() && !visited.count({i, j + 1}))
+            {
+                h.push({nums1[i] + nums2[j + 1], i, j + 1});
+                visited.insert({i, j + 1});
+            }
+        }
+
+        return res;
+    }
+
+    /*
+        @description: find the top k frequent elements in an array
+        @param: nums - vector of integers, k - number of top frequent elements to find
+        @return: vector of integers with top k frequent elements
+        @time complexity: O(n log n)
+        @space complexity: O(n)
+    */
+    vector<int> topKFrequent(vector<int> &nums, int k)
+    {
+        unordered_map<int, int> freq;
+
+        for (auto it : nums)
+            freq[it]++;
+
+        priority_queue<pair<int, int>> h;
+
+        for (auto it : freq)
+        {
+            h.push({it.second, it.first});
+        }
+
+        vector<int> res;
+        while (k-- && !h.empty())
+        {
+            res.push_back(h.top().second);
+            h.pop();
+        }
+
+        return res;
+    }
 };
 
 int main()
 {
     HeapProblems h;
-    vector<int> nums = {20, 15, 26, 2, 98, 6};
-    int k = 3;
-    cout << "The " << k << "rd largest element is: " << h.kthLargestElement(nums, k) << endl;
-
-    vector<int> sortedArr = h.sortNearlySortedArray(nums, k);
-
-    for (int num : sortedArr)
-        cout << num << " ";
-
-    cout << endl;
-    vector<int> res = h.replaceWithRank(nums);
-    for (int x : res)
-        cout << x << " ";
 
     return 0;
 }
