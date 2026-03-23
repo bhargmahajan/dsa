@@ -450,8 +450,7 @@ public:
     int eraseOverlapIntervals(vector<vector<int>> &intervals)
     {
         int res = 0;
-        sort(intervals.begin(), intervals.end(),
-             [](auto &a, auto &b)
+        sort(intervals.begin(), intervals.end(), [](auto &a, auto &b)
              { return a[1] < b[1]; });
         int end = intervals[0][1];
 
