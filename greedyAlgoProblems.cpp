@@ -469,8 +469,6 @@ public:
 int main()
 {
     GreedyAlgorithmProblems gap;
-    vector<int> jobs = {4, 3, 7, 1, 2};
-    cout << gap.calculateAverageWaitTime(jobs) << endl;
 
     return 0;
 }
