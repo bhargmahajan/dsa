@@ -148,4 +148,104 @@ public:
 
         return res;
     }
+
+    /**
+        @description: function to calculate the maximum depth of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: integer representing the maximum depth of the tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n) in the worst case (when the tree is skewed)
+    */
+    int maxDepth(TreeNode *root)
+    {
+        if (root == NULL)
+            return 0;
+
+        int l = maxDepth(root->left);
+        int r = maxDepth(root->right);
+
+        return 1 + max(l, r);
+    }
+
+    int dfsHeight(TreeNode *root)
+    {
+        if (root == NULL)
+            return 0;
+
+        int l = dfsHeight(root->left);
+        if (l == -1)
+            return -1;
+
+        int r = dfsHeight(root->right);
+        if (r == -1)
+            return -1;
+
+        if (abs(l - r) > 1)
+            return -1;
+
+        return 1 + max(l, r);
+    }
+
+    /**
+        @description: function to check if the binary tree is balanced
+        @param: root: pointer to the root of the binary tree
+        @return: boolean value indicating whether the tree is balanced or not
+        @time complexity: O(n)
+        @space complexity: O(1)
+    */
+    bool isBalanced(TreeNode *root) { return dfsHeight(root) != -1; }
+
+    int calculateHeight(TreeNode *node, int &d)
+    {
+        if (!node)
+            return 0;
+
+        int l = calculateHeight(node->left, d);
+        int r = calculateHeight(node->right, d);
+        d = max(d, l + r);
+
+        return max(l, r) + 1;
+    }
+
+    /**
+        @description: function to calculate the diameter of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: integer representing the diameter of the tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(1) in the worst case (when the tree is skewed)
+    */
+    int diameterOfBinaryTree(TreeNode *root)
+    {
+        int d = 0;
+        calculateHeight(root, d);
+        return d;
+    }
+
+    int dfs(TreeNode *node, int &maxSum)
+    {
+        if (!node)
+            return 0;
+
+        int l = max(0, dfs(node->left, maxSum));
+        int r = max(0, dfs(node->right, maxSum));
+        maxSum = max(maxSum, l + r + node->data);
+
+        return max(l, r) + node->data;
+    }
+
+    /**
+        @description: function to calculate the maximum path sum in the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: integer representing the maximum path sum
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(h) in the worst case (when the tree is skewed)
+    */
+    int maxPathSum(TreeNode *root)
+    {
+        int maxSum = INT_MIN;
+
+        dfs(root, maxSum);
+
+        return maxSum;
+    }
 };
