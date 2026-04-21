@@ -19,7 +19,8 @@ public:
         right = nullptr;
     }
 
-    TreeNode(int val, TreeNode *left, TreeNode *right) {
+    TreeNode(int val, TreeNode *left, TreeNode *right)
+    {
         data = val;
         left = left;
         right = right;
@@ -248,4 +249,365 @@ public:
 
         return maxSum;
     }
+
+    /**
+        @description: function to check if two binary trees are the same
+        @param: p: pointer to the root of the first binary tree
+        @param: q: pointer to the root of the second binary tree
+        @return: boolean value indicating whether the trees are the same or not
+        @time complexity: O(n+m), where m and n are the number of nodes in the two trees
+        @space complexity: O(1)
+    */
+    bool isSameTree(TreeNode *p, TreeNode *q)
+    {
+        if (p == NULL && q == NULL)
+            return true;
+
+        if (p == NULL || q == NULL)
+            return false;
+
+        return (p->data == q->data) && isSameTree(p->left, q->left) &&
+               isSameTree(p->right, q->right);
+    }
+
+    /**
+        @description: function to perform zigzag level order traversal of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: vector of vectors containing the zigzag level order traversal
+        @time complexity: O(n)
+        @space complexity: O(n)
+    */
+    vector<vector<int>> zigzagLevelOrder(TreeNode *root)
+    {
+        vector<vector<int>> res;
+        if (!root)
+            return res;
+
+        bool flag = true;
+        queue<TreeNode *> q;
+        q.push(root);
+
+        while (!q.empty())
+        {
+            int size = q.size();
+            vector<int> temp(size);
+
+            for (int i = 0; i < size; i++)
+            {
+                TreeNode *n = q.front();
+                q.pop();
+
+                int index = flag ? i : size - 1 - i;
+                temp[index] = n->data;
+
+                if (n->left)
+                    q.push(n->left);
+                if (n->right)
+                    q.push(n->right);
+            }
+
+            flag = !flag;
+            res.push_back(temp);
+        }
+
+        return res;
+    }
+
+    /**
+        @description: function to perform vertical order traversal of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: vector of vectors containing the vertical order traversal
+        @time complexity: O(N * log²N * log²N * log²N)), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    vector<vector<int>> verticalTraversal(TreeNode *root)
+    {
+        map<int, map<int, multiset<int>>> mp;
+        queue<pair<TreeNode *, pair<int, int>>> q;
+        q.push({root, {0, 0}});
+
+        while (!q.empty())
+        {
+            auto p = q.front();
+            q.pop();
+
+            TreeNode *temp = p.first;
+            int x = p.second.first, y = p.second.second;
+            mp[x][y].insert(temp->data);
+
+            if (temp->left)
+                q.push({temp->left, {x - 1, y + 1}});
+            if (temp->right)
+                q.push({temp->right, {x + 1, y + 1}});
+        }
+
+        vector<vector<int>> res;
+        for (auto p : mp)
+        {
+            vector<int> v;
+            for (auto t : p.second)
+            {
+                v.insert(v.end(), t.second.begin(), t.second.end());
+            }
+            res.push_back(v);
+        }
+
+        return res;
+    }
+
+    /**
+        @description: function to perform top view traversal of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: vector containing the top view traversal of the tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    vector<int> topView(TreeNode *root)
+    {
+        vector<int> res;
+        if (root == NULL)
+            return res;
+
+        map<int, int> mp;
+        queue<pair<TreeNode *, int>> q;
+        q.push({root, 0});
+
+        while (!q.empty())
+        {
+            auto it = q.front();
+            q.pop();
+            TreeNode *n = it.first;
+            int line = it.second;
+
+            if (mp.find(line) == mp.end())
+                mp[line] = n->data;
+
+            if (n->left != NULL)
+                q.push({n->left, line - 1});
+
+            if (n->right != NULL)
+                q.push({n->right, line + 1});
+        }
+
+        for (auto it : mp)
+            res.push_back(it.second);
+
+        return res;
+    }
+
+    /**
+        @description: function to perform bottom view traversal of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: vector containing the bottom view traversal of the tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    vector<int> bottomView(TreeNode *root)
+    {
+        vector<int> res;
+        if (root == NULL)
+            return res;
+
+        map<int, int> mp;
+        queue<pair<TreeNode *, int>> q;
+        q.push({root, 0});
+
+        while (!q.empty())
+        {
+            auto it = q.front();
+            q.pop();
+            TreeNode *n = it.first;
+            int line = it.second;
+
+            mp[line] = n->data;
+
+            if (n->left != NULL)
+                q.push({n->left, line - 1});
+
+            if (n->right != NULL)
+                q.push({n->right, line + 1});
+        }
+
+        for (auto it : mp)
+            res.push_back(it.second);
+
+        return res;
+    }
+
+    void right(TreeNode *root, int level, vector<int> &res)
+    {
+        if (!root)
+            return;
+
+        if (res.size() == level)
+            res.push_back(root->data);
+
+        right(root->right, level + 1, res);
+        right(root->left, level + 1, res);
+    }
+
+    /**
+        @description: function to perform right side view traversal of the binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: vector containing the right side view traversal of the tree
+        @time complexity: O(n)
+        @space complexity: O(h), where h is the height of the tree
+    */
+    vector<int> rightSideView(TreeNode *root)
+    {
+        vector<int> res;
+
+        right(root, 0, res);
+
+        return res;
+    }
+
+    bool mirror(TreeNode *left, TreeNode *right)
+    {
+        if (left == NULL || right == NULL)
+            return left == right;
+
+        return (left->data == right->data) && mirror(left->left, right->right) &&
+               mirror(left->right, right->left);
+    }
+
+    /**
+        @description: function to check if the binary tree is symmetric
+        @param: root: pointer to the root of the binary tree
+        @return: boolean value indicating whether the tree is symmetric or not
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(1), where h is the height of the tree
+    */
+    bool isSymmetric(TreeNode *root)
+    {
+        if (!root)
+            return true;
+
+        return mirror(root->left, root->right);
+    }
+
+    bool getPath(TreeNode *root, vector<int> &arr, int x)
+    {
+        if (!root)
+            return false;
+
+        arr.push_back(root->data);
+        if (root->data == x)
+            return true;
+
+        if (getPath(root->left, arr, x) || getPath(root->right, arr, x))
+            return true;
+
+        arr.pop_back();
+        return false;
+    }
+
+    /**
+        @description: function to find the path from the root to a given node in the binary tree
+        @param: A: pointer to the root of the binary tree
+        @param: B: integer value representing the target node
+        @return: vector containing the path from the root to the target node
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n), where n is the number of nodes in the tree
+    */
+    vector<int> solve(TreeNode *A, int B)
+    {
+        vector<int> res;
+        if (A == NULL)
+            return res;
+
+        getPath(A, res, B);
+
+        return res;
+    }
+
+    /**
+        @description: function to find the lowest common ancestor of two nodes in the binary tree
+        @param: root: pointer to the root of the binary tree
+        @param: p: pointer to the first node
+        @param: q: pointer to the second node
+        @return: pointer to the lowest common ancestor of the two nodes
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(h), where h is the height of the tree
+    */
+    TreeNode *lowestCommonAncestor(TreeNode *root, TreeNode *p, TreeNode *q)
+    {
+        if (root == NULL || root == p || root == q)
+            return root;
+
+        TreeNode *l = lowestCommonAncestor(root->left, p, q);
+        TreeNode *r = lowestCommonAncestor(root->right, p, q);
+
+        if (l == NULL)
+            return r;
+        else if (r == NULL)
+            return l;
+        else
+            return root;
+    }
+
+    void changeTree(TreeNode *root)
+    {
+        if (root == NULL)
+            return;
+
+        int child = 0;
+        if (root->left)
+            child += root->left->data;
+        if (root->right)
+            child += root->right->data;
+
+        if (child >= root->data)
+            root->data = child;
+        else
+        {
+            if (root->left)
+                root->left->data = root->data;
+            else if (root->right)
+                root->right->data = root->data;
+        }
+
+        changeTree(root->left);
+        changeTree(root->right);
+
+        int tot = 0;
+        if (root->left)
+            tot += root->left->data;
+        if (root->right)
+            tot += root->right->data;
+
+        if (root->left || root->right)
+            root->data = tot;
+    }
 };
+
+void inorderTraversal(TreeNode *root)
+{
+    if (root == nullptr)
+    {
+        return;
+    }
+    inorderTraversal(root->left);
+    cout << root->data << " ";
+    inorderTraversal(root->right);
+}
+
+int main()
+{
+    TreeNode *root = new TreeNode(2);
+    root->left = new TreeNode(35);
+    root->right = new TreeNode(10);
+    root->left->left = new TreeNode(2);
+    root->left->right = new TreeNode(3);
+    root->right->left = new TreeNode(5);
+    root->right->right = new TreeNode(2);
+
+    TreeProblems t;
+    t.changeTree(root);
+
+    cout << "Binary Tree after Children Sum Property: ";
+    inorderTraversal(root);
+    cout << endl;
+
+    return 0;
+}
