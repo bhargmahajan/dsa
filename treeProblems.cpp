@@ -546,6 +546,13 @@ public:
             return root;
     }
 
+    /**
+        @description: function to change the binary tree to satisfy the children sum property
+        @param: root: pointer to the root of the binary tree
+        @return: void
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(h), where h is the height of the tree
+    */
     void changeTree(TreeNode *root)
     {
         if (root == NULL)
@@ -578,6 +585,146 @@ public:
 
         if (root->left || root->right)
             root->data = tot;
+    }
+
+    void mapParentNodes(TreeNode *root, unordered_map<TreeNode *, TreeNode *> &parentMap)
+    {
+        queue<TreeNode *> q;
+        q.push(root);
+
+        while (!q.empty())
+        {
+            TreeNode *n = q.front();
+            q.pop();
+
+            if (n->left)
+            {
+                parentMap[n->left] = n;
+                q.push(n->left);
+            }
+
+            if (n->right)
+            {
+                parentMap[n->right] = n;
+                q.push(n->right);
+            }
+        }
+    }
+
+    vector<int> bfsFromTarget(TreeNode *target, unordered_map<TreeNode *, TreeNode *> &parentMap, int k)
+    {
+        queue<TreeNode *> q;
+        unordered_set<TreeNode *> visited;
+        int currLevel = 0;
+
+        q.push(target);
+        visited.insert(target);
+
+        while (!q.empty())
+        {
+            int s = q.size();
+
+            if (currLevel++ == k)
+                break;
+
+            for (int i = 0; i < s; i++)
+            {
+                TreeNode *n = q.front();
+                q.pop();
+
+                if (n->left && visited.find(n->left) == visited.end())
+                {
+                    visited.insert(n->left);
+                    q.push(n->left);
+                }
+
+                if (n->right && visited.find(n->right) == visited.end())
+                {
+                    visited.insert(n->right);
+                    q.push(n->right);
+                }
+
+                if (parentMap.count(n) &&
+                    visited.find(parentMap[n]) == visited.end())
+                {
+                    visited.insert(parentMap[n]);
+                    q.push(parentMap[n]);
+                }
+            }
+        }
+
+        vector<int> res;
+        while (!q.empty())
+        {
+            res.push_back(q.front()->data);
+            q.pop();
+        }
+
+        return res;
+    }
+
+    /**
+        @description: function to find the distance between two nodes in the binary tree
+        @param: root: pointer to the root of the binary tree
+        @param: target: pointer to the target node
+        @param: k: integer value representing the distance between the two nodes
+        @return: vector containing the distance between the two nodes
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+   vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
+    {
+        if (!root)
+            return {};
+
+        unordered_map<TreeNode *, TreeNode *> parentMap;
+        mapParentNodes(root, parentMap);
+
+        return bfsFromTarget(target, parentMap, k);
+    }
+
+    int findHeightLeft(TreeNode *node)
+    {
+        int h = 0;
+        while (node)
+        {
+            h++;
+            node = node->left;
+        }
+
+        return h;
+    }
+
+    int findHeightRight(TreeNode *node)
+    {
+        int h = 0;
+        while (node)
+        {
+            h++;
+            node = node->right;
+        }
+
+        return h;
+    }
+
+    /**
+        @description: function to count the number of nodes in a complete binary tree
+        @param: root: pointer to the root of the binary tree
+        @return: integer representing the number of nodes in the tree
+        @time complexity: O(log(n) * log(n)), where n is the number of nodes in the tree
+        @space complexity: O(1)
+    */
+    int countNodes(TreeNode *root)
+    {
+        if (root == NULL)
+            return 0;
+
+        int lh = findHeightLeft(root), rh = findHeightRight(root);
+
+        if (lh == rh)
+            return (1 << lh) - 1;
+
+        return 1 + countNodes(root->left) + countNodes(root->right);
     }
 };
 
