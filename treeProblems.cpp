@@ -726,6 +726,158 @@ public:
 
         return 1 + countNodes(root->left) + countNodes(root->right);
     }
+
+    TreeNode *build(vector<int> &preorder, int preStart, int preEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
+    {
+        if (preStart > preEnd || inStart > inEnd)
+            return nullptr;
+
+        TreeNode *root = new TreeNode(preorder[preStart]);
+        int inRoot = inMap[root->data];
+
+        int numsLeft = inRoot - inStart;
+
+        root->left = build(preorder, preStart + 1, preStart + numsLeft, inorder, inStart, inRoot - 1, inMap);
+        root->right = build(preorder, preStart + numsLeft + 1, preEnd, inorder, inRoot + 1, inEnd, inMap);
+
+        return root;
+    }
+
+    /**
+        @description: function to build a binary tree from its pre-order and in-order traversals
+        @param: preorder: vector containing the pre-order traversal of the tree
+        @param: inorder: vector containing the in-order traversal of the tree
+        @return: pointer to the root of the constructed binary tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    TreeNode *buildTree(vector<int> &preorder, vector<int> &inorder)
+    {
+        map<int, int> mp;
+
+        for (int i = 0; i < inorder.size(); i++)
+            mp[inorder[i]] = i;
+
+        return build(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
+    }
+
+    TreeNode *build(vector<int> &postorder, int postStart, int postEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
+    {
+        if (postStart > postEnd || inStart > inEnd)
+            return nullptr;
+
+        TreeNode *root = new TreeNode(postorder[postEnd]);
+        int inRoot = inMap[postorder[postEnd]];
+
+        int numsLeft = inRoot - inStart;
+
+        root->left = build(postorder, postStart, postStart + numsLeft - 1, inorder, inStart, inRoot - 1, inMap);
+        root->right = build(postorder, postStart + numsLeft, postEnd - 1, inorder, inRoot + 1, inEnd, inMap);
+
+        return root;
+    }
+
+    /**
+        @description: function to build a binary tree from its post-order and in-order traversals
+        @param: postorder: vector containing the post-order traversal of the tree
+        @param: inorder: vector containing the in-order traversal of the tree
+        @return: pointer to the root of the constructed binary tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    TreeNode *buildTree(vector<int> &inorder, vector<int> &postorder)
+    {
+        map<int, int> mp;
+
+        for (int i = 0; i < inorder.size(); i++)
+            mp[inorder[i]] = i;
+
+        return build(postorder, 0, postorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
+    }
+
+    /**
+        @description: function to serialize a binary tree into a string
+        @param: root: pointer to the root of the binary tree
+        @return: string representing the serialized binary tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    string serialize(TreeNode *root)
+    {
+        if (!root)
+            return "";
+
+        queue<TreeNode *> q;
+        string res = "";
+
+        q.push(root);
+
+        while (!q.empty())
+        {
+            TreeNode *curr = q.front();
+            q.pop();
+
+            if (curr == nullptr)
+                res += "#,";
+            else
+            {
+                res += to_string(curr->data) + ",";
+                q.push(curr->left);
+                q.push(curr->right);
+            }
+        }
+
+        return res;
+    }
+
+    /**
+        @description: function to deserialize a string into a binary tree
+        @param: data: string representing the serialized binary tree
+        @return: pointer to the root of the deserialized binary tree
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(n)
+    */
+    TreeNode *deserialize(string data)
+    {
+        if (data.empty())
+            return nullptr;
+
+        stringstream s(data);
+        string str;
+
+        getline(s, str, ',');
+
+        TreeNode *root = new TreeNode(stoi(str));
+        queue<TreeNode *> q;
+
+        q.push(root);
+
+        while (!q.empty())
+        {
+            TreeNode *node = q.front();
+            q.pop();
+
+            getline(s, str, ',');
+
+            if (str != "#")
+            {
+                TreeNode *left = new TreeNode(stoi(str));
+                node->left = left;
+                q.push(left);
+            }
+
+            getline(s, str, ',');
+
+            if (str != "#")
+            {
+                TreeNode *right = new TreeNode(stoi(str));
+                node->right = right;
+                q.push(right);
+            }
+        }
+
+        return root;
+    }
 };
 
 void inorderTraversal(TreeNode *root)
