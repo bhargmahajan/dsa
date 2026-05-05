@@ -878,6 +878,35 @@ public:
 
         return root;
     }
+
+    /**
+        @description: function to flatten a binary tree into a linked list in-place
+        @param: root: pointer to the root of the binary tree
+        @return: void
+        @time complexity: O(2n), where n is the number of nodes in the tree
+        @space complexity: O(1)
+    */
+    void flatten(TreeNode *root)
+    {
+        TreeNode *curr = root;
+
+        while (curr)
+        {
+            if (curr->left)
+            {
+                TreeNode *prev = curr->left;
+
+                while (prev->right)
+                    prev = prev->right;
+
+                prev->right = curr->right;
+                curr->right = curr->left;
+                curr->left = NULL;
+            }
+
+            curr = curr->right;
+        }
+    }
 };
 
 void inorderTraversal(TreeNode *root)
