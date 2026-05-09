@@ -22,8 +22,8 @@ public:
     TreeNode(int val, TreeNode *left, TreeNode *right)
     {
         data = val;
-        left = left;
-        right = right;
+        this->left = left;
+        this->right = right;
     }
 };
 
@@ -672,7 +672,7 @@ public:
         @time complexity: O(n), where n is the number of nodes in the tree
         @space complexity: O(n)
     */
-   vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
+    vector<int> distanceK(TreeNode *root, TreeNode *target, int k)
     {
         if (!root)
             return {};
@@ -727,7 +727,7 @@ public:
         return 1 + countNodes(root->left) + countNodes(root->right);
     }
 
-    TreeNode *build(vector<int> &preorder, int preStart, int preEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
+    TreeNode *buildFromPreorder(vector<int> &preorder, int preStart, int preEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
     {
         if (preStart > preEnd || inStart > inEnd)
             return nullptr;
@@ -737,8 +737,8 @@ public:
 
         int numsLeft = inRoot - inStart;
 
-        root->left = build(preorder, preStart + 1, preStart + numsLeft, inorder, inStart, inRoot - 1, inMap);
-        root->right = build(preorder, preStart + numsLeft + 1, preEnd, inorder, inRoot + 1, inEnd, inMap);
+        root->left = buildFromPreorder(preorder, preStart + 1, preStart + numsLeft, inorder, inStart, inRoot - 1, inMap);
+        root->right = buildFromPreorder(preorder, preStart + numsLeft + 1, preEnd, inorder, inRoot + 1, inEnd, inMap);
 
         return root;
     }
@@ -751,17 +751,17 @@ public:
         @time complexity: O(n), where n is the number of nodes in the tree
         @space complexity: O(n)
     */
-    TreeNode *buildTree(vector<int> &preorder, vector<int> &inorder)
+    TreeNode *buildTreeFromPreorder(vector<int> &preorder, vector<int> &inorder)
     {
         map<int, int> mp;
 
         for (int i = 0; i < inorder.size(); i++)
             mp[inorder[i]] = i;
 
-        return build(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
+        return buildFromPreorder(preorder, 0, preorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
     }
 
-    TreeNode *build(vector<int> &postorder, int postStart, int postEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
+    TreeNode *buildFromPostorder(vector<int> &postorder, int postStart, int postEnd, vector<int> &inorder, int inStart, int inEnd, map<int, int> &inMap)
     {
         if (postStart > postEnd || inStart > inEnd)
             return nullptr;
@@ -771,8 +771,8 @@ public:
 
         int numsLeft = inRoot - inStart;
 
-        root->left = build(postorder, postStart, postStart + numsLeft - 1, inorder, inStart, inRoot - 1, inMap);
-        root->right = build(postorder, postStart + numsLeft, postEnd - 1, inorder, inRoot + 1, inEnd, inMap);
+        root->left = buildFromPostorder(postorder, postStart, postStart + numsLeft - 1, inorder, inStart, inRoot - 1, inMap);
+        root->right = buildFromPostorder(postorder, postStart + numsLeft, postEnd - 1, inorder, inRoot + 1, inEnd, inMap);
 
         return root;
     }
@@ -785,14 +785,14 @@ public:
         @time complexity: O(n), where n is the number of nodes in the tree
         @space complexity: O(n)
     */
-    TreeNode *buildTree(vector<int> &inorder, vector<int> &postorder)
+    TreeNode *buildTreeFromPostorder(vector<int> &inorder, vector<int> &postorder)
     {
         map<int, int> mp;
 
         for (int i = 0; i < inorder.size(); i++)
             mp[inorder[i]] = i;
 
-        return build(postorder, 0, postorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
+        return buildFromPostorder(postorder, 0, postorder.size() - 1, inorder, 0, inorder.size() - 1, mp);
     }
 
     /**
@@ -907,6 +907,79 @@ public:
             curr = curr->right;
         }
     }
+
+    /**
+        @description: function to search for a node with a specific value in a BST
+        @param: root: pointer to the root of the BST
+        @param: val: value to search for
+        @return: pointer to the node if found, otherwise nullptr
+        @time complexity: O(log n), where h is the height of the tree
+        @space complexity: O(1)
+    */
+    TreeNode *searchBST(TreeNode *root, int val)
+    {
+        while (root != nullptr && root->data != val)
+        {
+            if (val < root->data)
+                root = root->left;
+            else if (val > root->data)
+                root = root->right;
+        }
+
+        return root;
+    }
+
+    void floorInBST(TreeNode *root, int key)
+    {
+        int floor = -1;
+
+        while (root)
+        {
+            if (root->data == key)
+            {
+                floor = root->data;
+                break;
+            }
+            else if (root->data > key)
+                root = root->left;
+            else
+            {
+                floor = root->data;
+                root = root->right;
+            }
+        }
+
+        cout << "Floor of " << key << " in the BST is: " << floor << endl;
+    }
+
+    void in(TreeNode *root, int &k, int &result)
+    {
+        if (root != nullptr)
+        {
+            in(root->left, k, result);
+            if (--k == 0)
+            {
+                result = root->data;
+                return;
+            }
+            in(root->right, k, result);
+        }
+    }
+
+    /**
+        @description: function to find the kth smallest element in a BST
+        @param: root: pointer to the root of the BST
+        @param: k: position of the element to find
+        @return: value of the kth smallest element
+        @time complexity: O(n), where n is the number of nodes in the tree
+        @space complexity: O(h)
+    */
+    int kthSmallest(TreeNode *root, int k)
+    {
+        int result=-1;
+        in(root, k, result);
+        return result;
+    }
 };
 
 void inorderTraversal(TreeNode *root)
@@ -936,6 +1009,8 @@ int main()
     cout << "Binary Tree after Children Sum Property: ";
     inorderTraversal(root);
     cout << endl;
+
+    t.floorInBST(root, 5);
 
     return 0;
 }
