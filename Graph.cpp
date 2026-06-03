@@ -299,6 +299,69 @@ public:
 
         return false;
     }
+
+    /*
+        @description: Count the number of enclaves in a grid
+        @param grid: The grid representing land and water
+        @return: The number of enclaves (land cells that cannot reach the boundary)
+        @time complexity: O(m * n) where m and n are the dimensions of the grid
+        @space complexity: O(m * n) for the visited array and queue
+    */
+    int numEnclaves(vector<vector<int>> &grid)
+    {
+        if (grid.empty() || grid[0].empty())
+            return 0;
+
+        int n = (int)grid.size(), m = (int)grid[0].size();
+        vector<vector<int>> vis(n, vector<int>(m, 0));
+        queue<pair<int, int>> q;
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (i == 0 || j == 0 || i == n - 1 || j == m - 1)
+                {
+                    if (grid[i][j] == 1)
+                    {
+                        vis[i][j] = 1;
+                        q.push({i, j});
+                    }
+                }
+            }
+        }
+
+        int delrow[] = {-1, 0, +1, 0}, delcol[] = {0, +1, 0, -1};
+
+        while (!q.empty())
+        {
+            auto [row, col] = q.front();
+            q.pop();
+
+            for (int i = 0; i < 4; i++)
+            {
+                int nr = row + delrow[i], nc = col + delcol[i];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !vis[nr][nc] && grid[nr][nc] == 1)
+                {
+                    vis[nr][nc] = 1;
+                    q.push({nr, nc});
+                }
+            }
+        }
+
+        int cnt = 0;
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (grid[i][j] == 1 && vis[i][j] == 0)
+                    cnt++;
+            }
+        }
+
+        return cnt;
+    }
 };
 
 int main()
