@@ -362,6 +362,143 @@ public:
 
         return cnt;
     }
+
+    /*
+        @description: Find the length of the shortest transformation sequence from beginWord to endWord, where only one letter can be changed at a time and each transformed word must exist in the word list
+        @param beginWord: The starting word
+        @param endWord: The target word
+        @param wordList: The list of allowed words for transformation
+        @return: The length of the shortest transformation sequence, or 0 if no such sequence exists
+        @time complexity: O(N * L*26) where N is the number of words in the word list, L is the length of each word, and 26 is the number of possible character transformations for each letter
+        @space complexity: O(N*L) where N is the number of words in the word list and L is the length of each word for the queue and set
+    */
+    int ladderLength(string beginWord, string endWord, vector<string> &wordList)
+    {
+        queue<pair<string, int>> q;
+        q.push({beginWord, 1});
+
+        unordered_set<string> st(wordList.begin(), wordList.end());
+        st.erase(beginWord);
+
+        while (!q.empty())
+        {
+            auto [word, steps] = q.front();
+            q.pop();
+
+            if (word == endWord)
+                return steps;
+
+            for (int i = 0; i < word.size(); i++)
+            {
+                char orig = word[i];
+
+                for (char ch = 'a'; ch <= 'z'; ch++)
+                {
+                    word[i] = ch;
+
+                    if (st.find(word) != st.end())
+                    {
+                        st.erase(word);
+                        q.push({word, steps + 1});
+                    }
+                }
+
+                word[i] = orig;
+            }
+        }
+
+        return 0;
+    }
+
+    void dfs(int row, int col, int baseRow, int baseCol, vector<vector<char>> &grid, vector<vector<int>> &vis, vector<pair<int, int>> &shape)
+    {
+        vis[row][col] = 1;
+        shape.push_back({row - baseRow, col - baseCol});
+
+        int drow[] = {-1, 0, 1, 0};
+        int dcol[] = {0, 1, 0, -1};
+
+        for (int i = 0; i < 4; i++)
+        {
+            int nrow = row + drow[i], ncol = col + dcol[i];
+
+            if (nrow >= 0 && nrow < grid.size() && ncol >= 0 && ncol < grid[0].size() && !vis[nrow][ncol] && grid[nrow][ncol] == '1')
+                dfs(nrow, ncol, baseRow, baseCol, grid, vis, shape);
+        }
+    }
+
+    /*
+        @description: Count the number of distinct islands in a grid, where two islands are considered distinct if their shapes are different
+        @param grid: The grid representing land and water
+        @return: The number of distinct islands
+        @time complexity: O(m * n) where m and n are the dimensions of the grid
+        @space complexity: O(m * n) for the visited array and shape vector
+    */
+    int numIslands(vector<vector<char>> &grid)
+    {
+        int n = grid.size(), m = grid[0].size();
+        vector<vector<int>> vis(n, vector<int>(m, 0));
+        vector<vector<pair<int, int>>> st;
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < m; j++)
+            {
+                if (grid[i][j] == '1' && !vis[i][j])
+                {
+                    vector<pair<int, int>> shape;
+                    dfs(i, j, i, j, grid, vis, shape);
+                    st.push_back(shape);
+                }
+            }
+        }
+
+        return st.size();
+    }
+
+    bool dfs(int node, int col, int c[], vector<vector<int>> graph)
+    {
+        c[node] = col;
+
+        for (auto it : graph[node])
+        {
+            if (c[it] == -1)
+            {
+                if (dfs(it, !col, c, graph) == false)
+                    return false;
+            }
+            else if (c[it] == col)
+                return false;
+        }
+
+        return true;
+    }
+
+    /*
+        @description: Determine if a graph is bipartite, meaning its vertices can be colored with two colors such that no two adjacent vertices share the same color
+        @param graph: The adjacency list representing the graph
+        @return: True if the graph is bipartite, false otherwise
+        @time complexity: O(V + 2E) where V is the number of vertices and E is the number of edges
+        @space complexity: O(V) for the color array and recursion stack
+    */
+    bool isBipartite(vector<vector<int>> &graph)
+    {
+        int v = graph.size();
+        int c[v];
+        for (int i = 0; i < v; i++)
+            c[i] = -1;
+
+        for (int i = 0; i < v; i++)
+        {
+            if (c[i] == -1)
+            {
+                if (dfs(i, 0, c, graph) == false)
+                    return false;
+            }
+        }
+
+        return true;
+    }
 };
 
 int main()
