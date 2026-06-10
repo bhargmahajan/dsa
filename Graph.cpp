@@ -307,108 +307,108 @@ public:
         @time complexity: O(m * n) where m and n are the dimensions of the grid
         @space complexity: O(m * n) for the visited array and queue
     */
-    int numEnclaves(vector<vector<int>> &grid)
-    {
-        if (grid.empty() || grid[0].empty())
-            return 0;
+    // int numEnclaves(vector<vector<int>> &grid)
+    // {
+    //     if (grid.empty() || grid[0].empty())
+    //         return 0;
 
-        int n = (int)grid.size(), m = (int)grid[0].size();
-        vector<vector<int>> vis(n, vector<int>(m, 0));
-        queue<pair<int, int>> q;
+    //     int n = (int)grid.size(), m = (int)grid[0].size();
+    //     vector<vector<int>> vis(n, vector<int>(m, 0));
+    //     queue<pair<int, int>> q;
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < m; j++)
-            {
-                if (i == 0 || j == 0 || i == n - 1 || j == m - 1)
-                {
-                    if (grid[i][j] == 1)
-                    {
-                        vis[i][j] = 1;
-                        q.push({i, j});
-                    }
-                }
-            }
-        }
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         for (int j = 0; j < m; j++)
+    //         {
+    //             if (i == 0 || j == 0 || i == n - 1 || j == m - 1)
+    //             {
+    //                 if (grid[i][j] == 1)
+    //                 {
+    //                     vis[i][j] = 1;
+    //                     q.push({i, j});
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        int delrow[] = {-1, 0, +1, 0}, delcol[] = {0, +1, 0, -1};
+    //     int delrow[] = {-1, 0, +1, 0}, delcol[] = {0, +1, 0, -1};
 
-        while (!q.empty())
-        {
-            auto [row, col] = q.front();
-            q.pop();
+    //     while (!q.empty())
+    //     {
+    //         auto [row, col] = q.front();
+    //         q.pop();
 
-            for (int i = 0; i < 4; i++)
-            {
-                int nr = row + delrow[i], nc = col + delcol[i];
+    //         for (int i = 0; i < 4; i++)
+    //         {
+    //             int nr = row + delrow[i], nc = col + delcol[i];
 
-                if (nr >= 0 && nr < n && nc >= 0 && nc < m && !vis[nr][nc] && grid[nr][nc] == 1)
-                {
-                    vis[nr][nc] = 1;
-                    q.push({nr, nc});
-                }
-            }
-        }
+    //             if (nr >= 0 && nr < n && nc >= 0 && nc < m && !vis[nr][nc] && grid[nr][nc] == 1)
+    //             {
+    //                 vis[nr][nc] = 1;
+    //                 q.push({nr, nc});
+    //             }
+    //         }
+    //     }
 
-        int cnt = 0;
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 0; j < m; j++)
-            {
-                if (grid[i][j] == 1 && vis[i][j] == 0)
-                    cnt++;
-            }
-        }
+    //     int cnt = 0;
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         for (int j = 0; j < m; j++)
+    //         {
+    //             if (grid[i][j] == 1 && vis[i][j] == 0)
+    //                 cnt++;
+    //         }
+    //     }
 
-        return cnt;
-    }
+    //     return cnt;
+    // }
 
-    /*
-        @description: Find the length of the shortest transformation sequence from beginWord to endWord, where only one letter can be changed at a time and each transformed word must exist in the word list
-        @param beginWord: The starting word
-        @param endWord: The target word
-        @param wordList: The list of allowed words for transformation
-        @return: The length of the shortest transformation sequence, or 0 if no such sequence exists
-        @time complexity: O(N * L*26) where N is the number of words in the word list, L is the length of each word, and 26 is the number of possible character transformations for each letter
-        @space complexity: O(N*L) where N is the number of words in the word list and L is the length of each word for the queue and set
-    */
-    int ladderLength(string beginWord, string endWord, vector<string> &wordList)
-    {
-        queue<pair<string, int>> q;
-        q.push({beginWord, 1});
+    // /*
+    //     @description: Find the length of the shortest transformation sequence from beginWord to endWord, where only one letter can be changed at a time and each transformed word must exist in the word list
+    //     @param beginWord: The starting word
+    //     @param endWord: The target word
+    //     @param wordList: The list of allowed words for transformation
+    //     @return: The length of the shortest transformation sequence, or 0 if no such sequence exists
+    //     @time complexity: O(N * L*26) where N is the number of words in the word list, L is the length of each word, and 26 is the number of possible character transformations for each letter
+    //     @space complexity: O(N*L) where N is the number of words in the word list and L is the length of each word for the queue and set
+    // */
+    // int ladderLength(string beginWord, string endWord, vector<string> &wordList)
+    // {
+    //     queue<pair<string, int>> q;
+    //     q.push({beginWord, 1});
 
-        unordered_set<string> st(wordList.begin(), wordList.end());
-        st.erase(beginWord);
+    //     unordered_set<string> st(wordList.begin(), wordList.end());
+    //     st.erase(beginWord);
 
-        while (!q.empty())
-        {
-            auto [word, steps] = q.front();
-            q.pop();
+    //     while (!q.empty())
+    //     {
+    //         auto [word, steps] = q.front();
+    //         q.pop();
 
-            if (word == endWord)
-                return steps;
+    //         if (word == endWord)
+    //             return steps;
 
-            for (int i = 0; i < word.size(); i++)
-            {
-                char orig = word[i];
+    //         for (int i = 0; i < word.size(); i++)
+    //         {
+    //             char orig = word[i];
 
-                for (char ch = 'a'; ch <= 'z'; ch++)
-                {
-                    word[i] = ch;
+    //             for (char ch = 'a'; ch <= 'z'; ch++)
+    //             {
+    //                 word[i] = ch;
 
-                    if (st.find(word) != st.end())
-                    {
-                        st.erase(word);
-                        q.push({word, steps + 1});
-                    }
-                }
+    //                 if (st.find(word) != st.end())
+    //                 {
+    //                     st.erase(word);
+    //                     q.push({word, steps + 1});
+    //                 }
+    //             }
 
-                word[i] = orig;
-            }
-        }
+    //             word[i] = orig;
+    //         }
+    //     }
 
-        return 0;
-    }
+    //     return 0;
+    // }
 
     void dfs(int row, int col, int baseRow, int baseCol, vector<vector<char>> &grid, vector<vector<int>> &vis, vector<pair<int, int>> &shape)
     {
@@ -499,18 +499,263 @@ public:
 
         return true;
     }
+
+    void sortDfs(int ind, vector<int> adj[], vector<int> &vis, stack<int> &st)
+    {
+        vis[ind] = 1;
+
+        for (auto it : adj[ind])
+        {
+            if (!vis[it])
+                sortDfs(it, adj, vis, st);
+        }
+
+        st.push(ind);
+    }
+
+    /*
+        @description: Perform topological sort on a directed acyclic graph using depth-first search
+        @param v: Number of vertices
+        @param adj: Adjacency list representing the graph
+        @return: A vector containing the vertices in topologically sorted order
+        @time complexity: O(V + E) where V is the number of vertices and E is the number of edges
+        @space complexity: O(V + E) for the visited array and stack
+    */
+    vector<int> topoSortDfs(int v, vector<int> adj[])
+    {
+        vector<int> vis(v, 0);
+        stack<int> st;
+
+        for (int i = 0; i < v; i++)
+        {
+            if (!vis[i])
+                sortDfs(i, adj, vis, st);
+        }
+
+        vector<int> res;
+        while (!st.empty())
+        {
+            res.push_back(st.top());
+            st.pop();
+        }
+
+        return res;
+    }
+
+    /*
+        @description: Perform topological sort on a directed acyclic graph using breadth-first search (Kahn's algorithm)
+        @param v: Number of vertices
+        @param adj: Adjacency list representing the graph
+        @return: A vector containing the vertices in topologically sorted order
+        @time complexity: O(V + E) where V is the number of vertices and E is the number of edges
+        @space complexity: O(V + E) for the visited array and queue
+    */
+    vector<int> topoSortbfs(int v, vector<int> adj[])
+    {
+        vector<int> vis(v, 0);
+
+        for (int i = 0; i < v; i++)
+        {
+            for (auto it : adj[i])
+                vis[it]++;
+        }
+
+        queue<int> q;
+        for (int i = 0; i < v; i++)
+        {
+            if (vis[i] == 0)
+                q.push(i);
+        }
+
+        vector<int> res;
+        while (!q.empty())
+        {
+            int n = q.front();
+            q.pop();
+
+            res.push_back(n);
+
+            for (auto it : adj[n])
+            {
+                vis[it]--;
+
+                if (vis[it] == 0)
+                    q.push(it);
+            }
+        }
+
+        return res;
+    }
+
+    /*
+        @description: Determine if all courses can be finished given their prerequisites
+        @param numCourses: Number of courses
+        @param prerequisites: List of prerequisite pairs
+        @return: True if all courses can be finished, false otherwise
+        @time complexity: O(V + E) where V is the number of courses and E is the number of prerequisites
+        @space complexity: O(V + E) for the adjacency list and visited array
+    */
+    bool canFinish(int numCourses, vector<vector<int>> &prerequisites)
+    {
+        vector<vector<int>> adj(numCourses);
+        vector<int> vis(numCourses, 0);
+
+        for (auto it : prerequisites)
+        {
+            int a = it[0], b = it[1];
+            adj[b].push_back(a);
+            vis[a]++;
+        }
+
+        queue<int> q;
+        for (int i = 0; i < numCourses; i++)
+        {
+            if (vis[i] == 0)
+                q.push(i);
+        }
+
+        int cnt = 0;
+        while (!q.empty())
+        {
+            int n = q.front();
+            q.pop();
+            cnt++;
+
+            for (auto it : adj[n])
+            {
+                vis[it]--;
+
+                if (vis[it] == 0)
+                    q.push(it);
+            }
+        }
+
+        return cnt == numCourses;
+    }
+
+    /*
+        @description: Find the order of courses to finish given their prerequisites
+        @param numCourses: Number of courses
+        @param prerequisites: List of prerequisite pairs
+        @return: A vector containing the order of courses to finish, or an empty vector if it's not possible to finish all courses
+        @time complexity: O(V + E) where V is the number of courses and E is the number of prerequisites
+        @space complexity: O(V + E) for the adjacency list and visited array
+    */
+    vector<int> findOrder(int numCourses, vector<vector<int>> &prerequisites)
+    {
+        vector<vector<int>> adj(numCourses);
+        vector<int> vis(numCourses, 0);
+
+        for (auto it : prerequisites)
+        {
+            int a = it[0], b = it[1];
+            adj[b].push_back(a);
+            vis[a]++;
+        }
+
+        queue<int> q;
+        for (int i = 0; i < numCourses; i++)
+        {
+            if (vis[i] == 0)
+                q.push(i);
+        }
+
+        vector<int> res;
+        while (!q.empty())
+        {
+            int n = q.front();
+            q.pop();
+
+            res.push_back(n);
+
+            for (auto it : adj[n])
+            {
+                vis[it]--;
+
+                if (vis[it] == 0)
+                    q.push(it);
+            }
+        }
+
+        if (res.size() == numCourses)
+            return res;
+
+        return {};
+    }
+
+    /*
+        @description: Find all eventually safe nodes in a directed graph
+        @param graph: The adjacency list representation of the graph
+        @return: A vector containing all eventually safe nodes
+        @time complexity: O(V + E) + O(N log N)`
+        @space complexity: O(3N) for the adjacency list, indegree array, and queue
+    */
+    vector<int> eventualSafeNodes(vector<vector<int>> &graph)
+    {
+        int v = graph.size();
+        vector<vector<int>> adj(v);
+        vector<int> indeg(v, 0);
+
+        for (int i = 0; i < v; i++)
+        {
+            for (int it : graph[i])
+            {
+                adj[it].push_back(i);
+                indeg[i]++;
+            }
+        }
+
+        queue<int> q;
+        vector<int> safeNodes;
+        for (int i = 0; i < v; i++)
+        {
+            if (indeg[i] == 0)
+                q.push(i);
+        }
+
+        while (!q.empty())
+        {
+            int node = q.front();
+            q.pop();
+
+            safeNodes.push_back(node);
+
+            for (auto it : adj[node])
+            {
+                indeg[it]--;
+                if (indeg[it] == 0)
+                    q.push(it);
+            }
+        }
+
+        sort(safeNodes.begin(), safeNodes.end());
+
+        return safeNodes;
+    }
 };
 
 int main()
 {
     Graph g;
-    vector<int> adj[4] = {{}, {2}, {1, 3}, {2}};
+    int V = 6, E = 6;
+    vector<int> adj[V];
+    adj[5].push_back(0);
+    adj[5].push_back(2);
+    adj[4].push_back(0);
+    adj[4].push_back(1);
+    adj[2].push_back(3);
+    adj[3].push_back(1);
 
-    bool ans = g.isCycle(4, adj);
-    if (ans)
-        cout << "1\n";
-    else
-        cout << "0\n";
+    // Get the topological order
+    vector<int> res = g.topoSortbfs(V, adj);
+
+    // Print the result
+    cout << "Topological Sort: ";
+    for (auto it : res)
+    {
+        cout << it << " ";
+    }
+    cout << endl;
 
     return 0;
 }
