@@ -732,29 +732,220 @@ public:
 
         return safeNodes;
     }
+
+    /*
+        @description: Find the shortest path from a source vertex to all other vertices in an unweighted graph
+        @param edges: List of edges in the graph
+        @param N: Number of vertices
+        @param M: Number of edges
+        @param src: The source vertex
+        @return: A vector containing the shortest distance from the source vertex to each vertex, or -1 if a vertex is unreachable
+        @time complexity: O(N+2M) where N is the number of vertices and M is the number of edges
+        @space complexity: O(N+M) for the adjacency list and distance array
+    */
+    vector<int> shortestPath(vector<vector<int>> &edges, int N, int M, int src)
+    {
+        vector<vector<int>> adj(N);
+
+        for (auto it : edges)
+        {
+            adj[it[0]].push_back(it[1]);
+            adj[it[1]].push_back(it[0]);
+        }
+
+        vector<int> dist(N, 1e9);
+        dist[src] = 0;
+        queue<int> q;
+        q.push(src);
+
+        while (!q.empty())
+        {
+            int node = q.front();
+            q.pop();
+
+            for (auto it : adj[node])
+            {
+                if (dist[node] + 1 < dist[it])
+                {
+                    dist[it] = dist[node] + 1;
+                    q.push(it);
+                }
+            }
+        }
+
+        vector<int> ans(N, -1);
+
+        for (int i = 0; i < N; i++)
+        {
+            if (dist[i] != 1e9)
+                ans[i] = dist[i];
+        }
+
+        return ans;
+    }
+
+    void topoSort(int node, vector<vector<pair<int, int>>> adj, vector<int> &vis, stack<int> &st)
+    {
+        vis[node] = 1;
+
+        for (auto it : adj[node])
+        {
+            if (!vis[it.first])
+                topoSort(it.first, adj, vis, st);
+        }
+
+        st.push(node);
+    }
+
+    /*
+        @description: Find the shortest path from a source vertex to all other vertices in a weighted graph
+        @param N: Number of vertices
+        @param M: Number of edges
+        @param edges: List of edges in the graph, each edge represented as {source, destination, weight}
+        @return: A vector containing the shortest distance from the source vertex to each vertex, or -1 if a vertex is unreachable
+        @time complexity: O(N + M)
+        @space complexity: O(N + M)
+    */
+    vector<int> shortestPath(int N, int M, vector<vector<int>> &edges)
+    {
+        vector<vector<pair<int, int>>> adj(N);
+
+        for (int i = 0; i < M; i++)
+            adj[edges[i][0]].push_back({edges[i][1], edges[i][2]});
+
+        vector<int> vis(N, 0), dist(N, 1e9);
+        stack<int> st;
+
+        for (int i = 0; i < N; i++)
+        {
+            if (!vis[i])
+                topoSort(i, adj, vis, st);
+        }
+
+        dist[0] = 0;
+        while(!st.empty()) {
+            int node=st.top();
+            st.pop();
+
+            for(auto it:adj[node]) {
+                if (dist[node] + it.second < dist[it.first])
+                    dist[it.first] = dist[node] + it.second;
+            }
+        }
+
+        for(int i=0; i<N; i++) {
+            if (dist[i] == 1e9)
+                dist[i] = -1;
+        }
+
+        return dist;
+    }
+
+    /*
+        @description: Find the shortest path from a source vertex to all other vertices in a weighted graph using Dijkstra's algorithm
+        @param V: Number of vertices
+        @param adj: Adjacency list representing the graph, where each edge is represented as {destination, weight}
+        @param S: The source vertex
+        @return: A vector containing the shortest distance from the source vertex to each vertex, or -1 if a vertex is unreachable
+        @time complexity: O(E log V) where V is the number of vertices and E is the number of edges
+        @space complexity: O(V + E) for the adjacency list and distance array
+    */
+    vector<int> dijkstra(int V, vector<vector<int>> adj[], int S){
+        set<pair<int, int>> s;
+        vector<int> dist(V, 1e9);
+        dist[S] = 0;
+        s.insert({0, S});
+
+        while(!s.empty()) {
+            auto it = *s.begin();
+            int node=it.second, dis=it.first;
+            s.erase(it);
+
+            for(auto it: adj[node]) {
+                int aNode=it[0], aEdge=it[1];
+
+                if(dis+aEdge < dist[aNode]) {
+                    if(dist[aNode]!=1e9)
+                        s.erase({dist[aNode], aNode});
+
+                    dist[aNode] = dis + aEdge;
+                    s.insert({dist[aNode], aNode});
+                }
+            }
+        }
+
+        return dist;
+    }
+
+    /*
+        @description: Find the shortest path from the top-left corner to the bottom-right corner in a binary matrix, where you can only move to adjacent cells that are 0 (open) and cannot move through cells that are 1 (blocked)
+        @param grid: The binary matrix representing the grid
+        @return: The length of the shortest path, or -1 if no such path exists
+        @time complexity: O(4*m * n) where m and n are the dimensions of the grid
+        @space complexity: O(m * n) for the distance array and queue
+    */
+    int shortestPathBinaryMatrix(vector<vector<int>> &grid)
+    {
+        int n = grid.size(), m = grid[0].size();
+        if (grid[0][0] == 1 || grid[n - 1][m - 1] == 1)
+            return -1;
+        if (n == 1 && m == 1)
+            return 1;
+
+        pair<int, int> dest = {n - 1, m - 1};
+        vector<vector<int>> dist(n, vector<int>(m, 1e9));
+        queue<pair<int, pair<int, int>>> q;
+
+        dist[0][0] = 0;
+        q.push({0, {0, 0}});
+
+        int dr[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+        int dc[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+        while (!q.empty())
+        {
+            int distance = q.front().first, r = q.front().second.first,
+                c = q.front().second.second;
+            q.pop();
+
+            for (int i = 0; i < 8; i++)
+            {
+                int nr = r + dr[i], nc = c + dc[i];
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m &&
+                    grid[nr][nc] == 0 && distance + 1 < dist[nr][nc])
+                {
+                    dist[nr][nc] = distance + 1;
+
+                    if (nr == dest.first && nc == dest.second)
+                        return distance + 2;
+
+                    q.push({distance + 1, {nr, nc}});
+                }
+            }
+        }
+
+        return -1;
+    }
 };
 
 int main()
 {
     Graph g;
-    int V = 6, E = 6;
-    vector<int> adj[V];
-    adj[5].push_back(0);
-    adj[5].push_back(2);
-    adj[4].push_back(0);
-    adj[4].push_back(1);
-    adj[2].push_back(3);
-    adj[3].push_back(1);
+    int V = 3, E = 3, S = 2;
+    vector<vector<int>> adj[V];
 
-    // Get the topological order
-    vector<int> res = g.topoSortbfs(V, adj);
+    vector<int> v1{1, 1}, v2{2, 6}, v3{2, 3}, v4{0, 1}, v5{1, 3}, v6{0, 6};
+    adj[0].push_back(v1);
+    adj[0].push_back(v2);
+    adj[1].push_back(v3);
+    adj[1].push_back(v4);
+    adj[2].push_back(v5);
+    adj[2].push_back(v6);
 
-    // Print the result
-    cout << "Topological Sort: ";
-    for (auto it : res)
-    {
-        cout << it << " ";
-    }
+    vector<int> res = g.dijkstra(V, adj, S);
+
+    for (int i = 0; i < V; i++)
+        cout << res[i] << " ";
     cout << endl;
 
     return 0;
