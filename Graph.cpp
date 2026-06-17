@@ -823,17 +823,20 @@ public:
         }
 
         dist[0] = 0;
-        while(!st.empty()) {
-            int node=st.top();
+        while (!st.empty())
+        {
+            int node = st.top();
             st.pop();
 
-            for(auto it:adj[node]) {
+            for (auto it : adj[node])
+            {
                 if (dist[node] + it.second < dist[it.first])
                     dist[it.first] = dist[node] + it.second;
             }
         }
 
-        for(int i=0; i<N; i++) {
+        for (int i = 0; i < N; i++)
+        {
             if (dist[i] == 1e9)
                 dist[i] = -1;
         }
@@ -850,22 +853,26 @@ public:
         @time complexity: O(E log V) where V is the number of vertices and E is the number of edges
         @space complexity: O(V + E) for the adjacency list and distance array
     */
-    vector<int> dijkstra(int V, vector<vector<int>> adj[], int S){
+    vector<int> dijkstra(int V, vector<vector<int>> adj[], int S)
+    {
         set<pair<int, int>> s;
         vector<int> dist(V, 1e9);
         dist[S] = 0;
         s.insert({0, S});
 
-        while(!s.empty()) {
+        while (!s.empty())
+        {
             auto it = *s.begin();
-            int node=it.second, dis=it.first;
+            int node = it.second, dis = it.first;
             s.erase(it);
 
-            for(auto it: adj[node]) {
-                int aNode=it[0], aEdge=it[1];
+            for (auto it : adj[node])
+            {
+                int aNode = it[0], aEdge = it[1];
 
-                if(dis+aEdge < dist[aNode]) {
-                    if(dist[aNode]!=1e9)
+                if (dis + aEdge < dist[aNode])
+                {
+                    if (dist[aNode] != 1e9)
                         s.erase({dist[aNode], aNode});
 
                     dist[aNode] = dis + aEdge;
@@ -926,27 +933,476 @@ public:
 
         return -1;
     }
+
+    /*
+        @description: Find the minimum effort path from the top-left corner to the bottom-right corner in a grid of heights
+        @param heights: The grid of heights
+        @return: The minimum effort required to reach the destination
+        @time complexity: O(4 * m * n * log(m * n)) where m and n are the dimensions of the grid
+        @space complexity: O(m * n) for the distance array and priority queue
+    */
+    int minimumEffortPath(vector<vector<int>> &heights)
+    {
+        priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> q;
+
+        int n = heights.size(), m = heights[0].size();
+        vector<vector<int>> dist(n, vector<int>(m, 1e9));
+        dist[0][0] = 0;
+        q.push({0, {0, 0}});
+
+        int dr[] = {-1, 0, 1, 0}, dc[] = {0, 1, 0, -1};
+
+        while (!q.empty())
+        {
+            int diff = q.top().first, r = q.top().second.first, c = q.top().second.second;
+            q.pop();
+
+            if (r == n - 1 && c == m - 1)
+                return diff;
+
+            for (int i = 0; i < 4; i++)
+            {
+                int nr = dr[i] + r, nc = dc[i] + c;
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m)
+                {
+                    int eff = max(abs(heights[r][c] - heights[nr][nc]), diff);
+
+                    if (eff < dist[nr][nc])
+                    {
+                        dist[nr][nc] = eff;
+                        q.push({eff, {nr, nc}});
+                    }
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /*
+        @description: Find the cheapest price to reach the destination within k stops
+        @param n: Number of cities
+        @param flights: List of flights with their prices
+        @param src: Source city
+        @param dst: Destination city
+        @param k: Maximum number of stops allowed
+        @return: The cheapest price to reach the destination, or -1 if not possible
+        @time complexity: O(k * N)
+        @space complexity: O(E+V) for the adjacency list and distance array
+    */
+    int findCheapestPrice(int n, vector<vector<int>> &flights, int src, int dst, int k)
+    {
+        vector<vector<pair<int, int>>> adj(n);
+
+        for (auto it : flights)
+            adj[it[0]].push_back({it[1], it[2]});
+
+        queue<pair<int, pair<int, int>>> q;
+        vector<int> dist(n, 1e9);
+        dist[src] = 0;
+        q.push({0, {src, 0}});
+
+        while (!q.empty())
+        {
+            int steps = q.front().first, node = q.front().second.first, cost = q.front().second.second;
+            q.pop();
+
+            if (steps > k)
+                continue;
+
+            for (auto no : adj[node])
+            {
+                if (cost + no.second < dist[no.first] && steps <= k)
+                {
+                    dist[no.first] = cost + no.second;
+                    q.push({steps + 1, {no.first, cost + no.second}});
+                }
+            }
+        }
+
+        if (dist[dst] == 1e9)
+            return -1;
+
+        return dist[dst];
+    }
+
+    /*
+        @description: Find the network delay time for a given source node
+        @param times: List of travel times between nodes
+        @param n: Number of nodes
+        @param k: Source node
+        @return: The network delay time, or -1 if not possible
+        @time complexity: O((E+V) * log V) where E is the number of edges and V is the number of nodes
+        @space complexity: O(V + E) for the adjacency list and distance array
+    */
+    int networkDelayTime(vector<vector<int>> &times, int n, int k)
+    {
+        vector<vector<pair<int, int>>> adj(n + 1);
+        for (auto it : times)
+        {
+            int u = it[0], v = it[1], w = it[2];
+            adj[u].push_back({v, w});
+        }
+
+        vector<int> dist(n + 1, INT_MAX);
+        dist[k] = 0;
+
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> q;
+        q.push({0, k});
+
+        while (!q.empty())
+        {
+            int w = q.top().first;
+            int node = q.top().second;
+            q.pop();
+
+            for (auto it : adj[node])
+            {
+                if (it.second + w < dist[it.first])
+                {
+                    dist[it.first] = it.second + w;
+                    q.push({dist[it.first], it.first});
+                }
+            }
+        }
+
+        int ans = *max_element(dist.begin() + 1, dist.end());
+
+        return ans == INT_MAX ? -1 : ans;
+    }
+
+    /*
+        @description: Count the number of paths from source to destination with minimum cost
+        @param n: Number of nodes
+        @param roads: List of roads with their weights
+        @return: The number of paths with minimum cost
+        @time complexity: O(E * log V) where E is the number of edges and V is the number of nodes
+        @space complexity: O(N) for the adjacency list and distance array
+    */
+    // int countPaths(int n, vector<vector<int>> &roads)
+    // {
+    //     vector<vector<pair<int, long long>>> adj(n);
+    //     for (auto it : roads)
+    //     {
+    //         adj[it[0]].push_back({it[1], it[2]});
+    //         adj[it[1]].push_back({it[0], it[2]});
+    //     }
+
+    //     priority_queue<pair<long long, int>, vector<pair<long long, int>>, greater<pair<long long, int>>> h;
+
+    //     vector<long long> dist(n, LLONG_MAX);
+    //     vector<int> ways(n, 0);
+    //     int mod = 1e9 + 7;
+
+    //     dist[0] = 0;
+    //     ways[0] = 1;
+    //     h.push({0, 0});
+
+    //     while (!h.empty())
+    //     {
+    //         auto [dis, node] = h.top();
+    //         h.pop();
+
+    //         if (dis > dist[node])
+    //             continue;
+
+    //         for (auto [dest, time] : adj[node])
+    //         {
+    //             if (dis + time < dist[dest])
+    //             {
+    //                 dist[dest] = dis + time;
+    //                 h.push({dist[dest], dest});
+    //                 ways[dest] = ways[node];
+    //             }
+    //             else if (dis + time == dist[dest])
+    //             {
+    //                 ways[dest] = (ways[dest] + ways[node]) % mod;
+    //             }
+    //         }
+    //     }
+
+    //     return ways[n - 1] % mod;
+    // }
+
+    /*
+        @description: Find the shortest path from a source vertex to all other vertices in a weighted graph using Bellman-Ford algorithm, which can handle negative weight edges
+        @param V: Number of vertices
+        @param edges: List of edges in the graph, each edge represented as {source, destination, weight}
+        @param S: The source vertex
+        @return: A vector containing the shortest distance from the source vertex to each vertex, or -1 if a negative weight cycle is detected
+        @time complexity: O(V * E) where V is the number of vertices and E is the number of edges
+        @space complexity: O(V) for the distance array
+    */
+    vector<int> bellman_ford(int V, vector<vector<int>> &edges, int S)
+    {
+        vector<int> dist(V, 1e9);
+        dist[S] = 0;
+
+        for (int i = 0; i < V - 1; i++)
+        {
+            for (auto it : edges)
+            {
+                int u = it[0], v = it[1], w = it[2];
+
+                if (dist[u] != 1e9 && dist[u] + w < dist[v])
+                    dist[v] = dist[u] + w;
+            }
+        }
+
+        for (auto it : edges)
+        {
+            int u = it[0], v = it[1], w = it[2];
+
+            if (dist[u] != 1e9 && dist[u] + w < dist[v])
+                return {-1};
+        }
+
+        return dist;
+    }
+
+    /*
+        @description: Find the shortest distance between all pairs of vertices in a graph using Floyd-Warshall algorithm
+        @param matrix: The adjacency matrix representing the graph, where matrix[i][j] is the weight of the edge from vertex i to vertex j, or -1 if there is no edge
+        @return: The modified adjacency matrix where matrix[i][j] is the shortest distance from vertex i to vertex j, or -1 if vertex j is unreachable from vertex i
+        @time complexity: O(n^3) where n is the number of vertices
+        @space complexity: O(V^2) for in-place modification of the input matrix
+    */
+    void shortest_distance(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size();
+
+        for (int k = 0; k < n; k++)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (matrix[i][k] == -1 || matrix[k][j] == -1)
+                        continue;
+
+                    if (matrix[i][j] == -1)
+                        matrix[i][j] = matrix[i][k] + matrix[k][j];
+                    else
+                        matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+                }
+            }
+        }
+    }
+
+    /*
+        @description: Find the city with the smallest number of cities that are reachable within a given distance threshold
+        @param n: Number of cities
+        @param edges: List of edges in the graph, each edge represented as {source, destination, weight}
+        @param distanceThreshold: The maximum distance allowed for a city to be considered reachable
+        @return: The city number with the smallest number of reachable cities within the threshold, or the largest city number if there's a tie
+        @time complexity: O(n^3) where n is the number of cities
+        @space complexity: O(n^2) for the distance matrix
+    */
+    int findTheCity(int n, vector<vector<int>> &edges, int distanceThreshold)
+    {
+        vector<vector<int>> dist(n, vector<int>(n, INT_MAX));
+
+        for (auto it : edges)
+        {
+            dist[it[0]][it[1]] = it[2];
+            dist[it[1]][it[0]] = it[2];
+        }
+
+        for (int i = 0; i < n; i++)
+            dist[i][i] = 0;
+
+        for (int k = 0; k < n; k++)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    if (dist[i][k] == INT_MAX || dist[k][j] == INT_MAX)
+                        continue;
+                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+                }
+            }
+        }
+
+        int cntCity = n, cityNo = -1;
+        for (int city = 0; city < n; city++)
+        {
+            int cnt = 0;
+            for (int adjCity = 0; adjCity < n; adjCity++)
+            {
+                if (dist[city][adjCity] <= distanceThreshold)
+                    cnt++;
+            }
+
+            if (cnt <= cntCity)
+            {
+                cntCity = cnt;
+                cityNo = city;
+            }
+        }
+
+        return cityNo;
+    }
+
+    /*
+        @description: Find the sum of all edge weights in the minimum spanning tree of a graph using Prim's algorithm
+        @param V: Number of vertices
+        @param adj: Adjacency list representing the graph, where each edge is represented as {destination, weight}
+        @return: The sum of all edge weights in the minimum spanning tree
+        @time complexity: O(E log E) where E is the number of edges and V is the number of vertices
+        @space complexity: O(V + E) for the adjacency list and visited array
+    */
+    int spanningTree(int V, vector<vector<int>> adj[])
+    {
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+        vector<int> vis(V, 0);
+
+        pq.push({0, 0});
+        int sum = 0;
+
+        while (!pq.empty())
+        {
+            int wt = pq.top().first;
+            int node = pq.top().second;
+            pq.pop();
+
+            if (vis[node])
+                continue;
+
+            vis[node] = 1;
+            sum += wt;
+
+            for (auto it : adj[node])
+            {
+                int adjNode = it[0], edgeWt = it[1];
+
+                if (!vis[adjNode])
+                    pq.push({edgeWt, adjNode});
+            }
+        }
+
+        return sum;
+    }
+};
+
+/*
+    @description: Disjoint Set Union (DSU) or Union-Find data structure implementation with union by rank and union by size optimizations
+    @author: Bharg Mahajan
+*/
+class DisjointSet
+{
+    vector<int> rank, parent, size;
+
+public:
+    DisjointSet(int n)
+    {
+        rank.resize(n + 1, 0);
+        parent.resize(n + 1);
+        size.resize(n + 1);
+
+        for (int i = 0; i <= n; i++)
+        {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+
+    /*
+        @description: Find the ultimate parent of a node with path compression optimization
+        @param node: The node for which to find the ultimate parent
+        @return: The ultimate parent of the node
+        @time complexity: O(log N) amortized, where N is the number of nodes
+        @space complexity: O(1) for the recursive stack in path compression
+    */
+    int findUPar(int node)
+    {
+        if (node == parent[node])
+            return node;
+
+        return parent[node] = findUPar(parent[node]);
+    }
+
+    /*
+        @description: Union two sets by rank
+        @param u: First node
+        @param v: Second node
+        @return: None
+        @time complexity: O(log N) amortized, where N is the number of nodes
+        @space complexity: O(1) for the recursive stack in path compression
+    */
+    void unionByRank(int u, int v)
+    {
+        int up = findUPar(u);
+        int vp = findUPar(v);
+
+        if (up == vp)
+            return;
+
+        if (rank[up] > rank[vp])
+            parent[vp] = up;
+        else if (rank[up] < rank[vp])
+            parent[up] = vp;
+        else
+        {
+            parent[vp] = up;
+            rank[up]++;
+        }
+    }
+
+    /*
+        @description: Union two sets by size
+        @param u: First node
+        @param v: Second node
+        @return: None
+        @time complexity: O(log N) amortized, where N is the number of nodes
+        @space complexity: O(1) for the recursive stack in path compression
+    */
+    void unionBySize(int u, int v)
+    {
+        int up = findUPar(u);
+        int vp = findUPar(v);
+
+        if (up == vp)
+            return;
+
+        if (size[up] < size[vp])
+        {
+            parent[up] = vp;
+            size[vp] += size[up];
+        }
+        else
+        {
+            parent[vp] = up;
+            size[up] += size[vp];
+        }
+    }
 };
 
 int main()
 {
-    Graph g;
-    int V = 3, E = 3, S = 2;
-    vector<vector<int>> adj[V];
+    DisjointSet ds(7);
+    ds.unionBySize(1, 2);
+    ds.unionBySize(2, 3);
+    ds.unionBySize(4, 5);
+    ds.unionBySize(6, 7);
+    ds.unionBySize(5, 6);
 
-    vector<int> v1{1, 1}, v2{2, 6}, v3{2, 3}, v4{0, 1}, v5{1, 3}, v6{0, 6};
-    adj[0].push_back(v1);
-    adj[0].push_back(v2);
-    adj[1].push_back(v3);
-    adj[1].push_back(v4);
-    adj[2].push_back(v5);
-    adj[2].push_back(v6);
+    if (ds.findUPar(3) == ds.findUPar(7))
+    {
+        cout << "Same\n";
+    }
+    else
+        cout << "Not same\n";
 
-    vector<int> res = g.dijkstra(V, adj, S);
+    ds.unionByRank(3, 7);
 
-    for (int i = 0; i < V; i++)
-        cout << res[i] << " ";
-    cout << endl;
+    if (ds.findUPar(3) == ds.findUPar(7))
+    {
+        cout << "Same\n";
+    }
+    else
+        cout << "Not same\n";
 
     return 0;
 }
