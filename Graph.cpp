@@ -1290,12 +1290,12 @@ public:
     @description: Disjoint Set Union (DSU) or Union-Find data structure implementation with union by rank and union by size optimizations
     @author: Bharg Mahajan
 */
-class DisjointSet
+class DSU
 {
     vector<int> rank, parent, size;
 
 public:
-    DisjointSet(int n)
+    DSU(int n)
     {
         rank.resize(n + 1, 0);
         parent.resize(n + 1);
@@ -1315,12 +1315,12 @@ public:
         @time complexity: O(log N) amortized, where N is the number of nodes
         @space complexity: O(1) for the recursive stack in path compression
     */
-    int findUPar(int node)
+    int find(int node)
     {
         if (node == parent[node])
             return node;
 
-        return parent[node] = findUPar(parent[node]);
+        return parent[node] = find(parent[node]);
     }
 
     /*
@@ -1333,8 +1333,8 @@ public:
     */
     void unionByRank(int u, int v)
     {
-        int up = findUPar(u);
-        int vp = findUPar(v);
+        int up = find(u);
+        int vp = find(v);
 
         if (up == vp)
             return;
@@ -1360,8 +1360,8 @@ public:
     */
     void unionBySize(int u, int v)
     {
-        int up = findUPar(u);
-        int vp = findUPar(v);
+        int up = find(u);
+        int vp = find(v);
 
         if (up == vp)
             return;
@@ -1377,32 +1377,177 @@ public:
             size[up] += size[vp];
         }
     }
+
+    /*
+        @description: Make all computers connected with minimum number of operations
+        @param n: Number of computers
+        @param connections: List of existing connections
+        @return: Minimum number of operations required or -1 if not possible
+        @time complexity: O(N + M × α(N)) where N is the number of computers and M is the number of connections
+        @space complexity: O(N) for the parent and size arrays
+    */
+    int makeConnected(int n, vector<vector<int>> &connections)
+    {
+        if (connections.size() < n - 1)
+            return -1;
+
+        DSU dsu(n);
+        for (auto edge : connections)
+            dsu.unionByRank(edge[0], edge[1]);
+
+        unordered_set<int> components;
+        for (int i = 0; i < n; i++)
+            components.insert(dsu.find(i));
+
+        return components.size() - 1;
+    }
+
+    class DSUB
+    {
+    public:
+        unordered_map<int, int> parent;
+
+        int find(int x)
+        {
+            if (parent.find(x) == parent.end())
+                parent[x] = x;
+
+            if (x != parent[x])
+                parent[x] = find(parent[x]);
+
+            return parent[x];
+        }
+
+        void unite(int x, int y) { parent[find(x)] = find(y); }
+    };
+
+    /*
+        @description: Remove maximum number of stones such that each remaining stone is isolated
+        @param stones: List of stone positions
+        @return: Maximum number of stones that can be removed
+        @time complexity: O(N × α(N)) where N is the number of stones
+        @space complexity: O(N) for the parent map
+    */
+    int removeStones(vector<vector<int>> &stones)
+    {
+        DSUB dsu;
+
+        for (auto it : stones)
+            dsu.unite(it[0], it[1] + 10001);
+
+        unordered_set<int> components;
+        for (auto stone : stones)
+            components.insert(dsu.find(stone[0]));
+
+        return stones.size() - components.size();
+    }
+};
+
+class DSU
+{
+    vector<int> size, parent;
+
+public:
+    DSU(int n)
+    {
+        parent.resize(n + 1);
+        size.resize(n + 1);
+
+        for (int i = 0; i <= n; i++)
+        {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+
+    int find(int node)
+    {
+        if (node == parent[node])
+            return node;
+
+        return find(parent[node]);
+    }
+
+    void unite(int u, int v)
+    {
+        int up = find(u), vp = find(v);
+
+        if (up == vp)
+            return;
+
+        if (size[up] < size[vp])
+        {
+            parent[up] = vp;
+            size[vp] += size[up];
+        }
+        else
+        {
+            parent[vp] = up;
+            size[up] = size[vp];
+        }
+    }
+};
+
+class Solution
+{
+public:
+    /*
+        @description: Merge accounts with overlapping emails
+        @param accounts: List of accounts with names and emails
+        @return: Merged accounts with sorted emails
+        @time complexity: O(N+E) + O(E*4ɑ) + O(N*(ElogE + E)) where N is the number of accounts and E is the total number of emails
+        @space complexity: O(N) for the mail map and merged emails
+    */
+    vector<vector<string>> accountsMerge(vector<vector<string>> &accounts)
+    {
+        int n = accounts.size();
+        DSU ds(n);
+        unordered_map<string, int> mailMap;
+
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 1; j < accounts[i].size(); j++)
+            {
+                string mail = accounts[i][j];
+
+                if (mailMap.find(mail) == mailMap.end())
+                    mailMap[mail] = i;
+                else
+                    ds.unite(i, mailMap[mail]);
+            }
+        }
+
+        vector<string> mailMerge[n];
+        for (auto it : mailMap)
+        {
+            string mail = it.first;
+            int node = ds.find(it.second);
+            mailMerge[node].push_back(mail);
+        }
+
+        vector<vector<string>> ans;
+        for (int i = 0; i < n; i++)
+        {
+            if (mailMerge[i].empty())
+                continue;
+
+            sort(mailMerge[i].begin(), mailMerge[i].end());
+            vector<string> temp;
+            temp.push_back(accounts[i][0]);
+
+            for (auto mail : mailMerge[i])
+                temp.push_back(mail);
+
+            ans.push_back(temp);
+        }
+
+        sort(ans.begin(), ans.end());
+
+        return ans;
+    }
 };
 
 int main()
 {
-    DisjointSet ds(7);
-    ds.unionBySize(1, 2);
-    ds.unionBySize(2, 3);
-    ds.unionBySize(4, 5);
-    ds.unionBySize(6, 7);
-    ds.unionBySize(5, 6);
-
-    if (ds.findUPar(3) == ds.findUPar(7))
-    {
-        cout << "Same\n";
-    }
-    else
-        cout << "Not same\n";
-
-    ds.unionByRank(3, 7);
-
-    if (ds.findUPar(3) == ds.findUPar(7))
-    {
-        cout << "Same\n";
-    }
-    else
-        cout << "Not same\n";
-
     return 0;
 }
