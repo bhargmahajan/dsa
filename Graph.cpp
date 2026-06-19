@@ -1284,6 +1284,49 @@ public:
 
         return sum;
     }
+
+    /*
+        @description: Find the minimum time to swim from the top-left corner to the bottom-right corner of a grid, where each cell's value represents the water level at that time
+        @param grid: The grid representing the water levels at different times
+        @return: The minimum time to reach the destination
+        @time complexity: O(n^2 log n) where n is the dimension of the grid
+        @space complexity: O(n^2) for the visited array and priority queue
+    */
+    int swimInWater(vector<vector<int>> &grid)
+    {
+        int n = grid.size();
+        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>>
+            h;
+        vector<vector<int>> vis(n, vector<int>(n, 0));
+        vector<pair<int, int>> dir = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+
+        h.push({grid[0][0], 0, 0});
+        vis[0][0] = 1;
+
+        while (!h.empty())
+        {
+            auto cur = h.top();
+            h.pop();
+
+            int el = cur[0], r = cur[1], c = cur[2];
+
+            if (r == n - 1 && c == n - 1)
+                return el;
+
+            for (auto di : dir)
+            {
+                int nr = r + di.first, nc = c + di.second;
+
+                if (nr >= 0 && nr < n && nc >= 0 && nc < n && !vis[nr][nc])
+                {
+                    vis[nr][nc] = 1;
+                    h.push({max(el, grid[nr][nc]), nr, nc});
+                }
+            }
+        }
+
+        return -1;
+    }
 };
 
 /*
@@ -1542,6 +1585,138 @@ public:
         }
 
         sort(ans.begin(), ans.end());
+
+        return ans;
+    }
+};
+
+class LargeIsland
+{
+    class DSU
+    {
+    public:
+        vector<int> parent, size;
+
+        DSU(int n)
+        {
+            parent.resize(n + 1);
+            size.resize(n + 1);
+            for (int i = 0; i <= n; i++)
+            {
+                parent[i] = i;
+                size[i] = 1;
+            }
+        }
+
+        int findUPar(int node)
+        {
+            if (node == parent[node])
+                return node;
+            return parent[node] = findUPar(parent[node]);
+        }
+
+        void unite(int u, int v)
+        {
+            int ulp_u = findUPar(u);
+            int ulp_v = findUPar(v);
+
+            if (ulp_u == ulp_v)
+                return;
+
+            if (size[ulp_u] < size[ulp_v])
+            {
+                parent[ulp_u] = ulp_v;
+                size[ulp_v] += size[ulp_u];
+            }
+            else
+            {
+                parent[ulp_v] = ulp_u;
+                size[ulp_u] += size[ulp_v];
+            }
+        }
+    };
+
+    vector<int> delRow = {-1, 0, 1, 0};
+    vector<int> delCol = {0, 1, 0, -1};
+
+    bool isValid(int &i, int &j, int &n)
+    {
+        if (i < 0 || i >= n)
+            return false;
+        if (j < 0 || j >= n)
+            return false;
+
+        return true;
+    }
+
+    void addInitialIslands(vector<vector<int>> grid, DSU &ds, int n)
+    {
+        for (int row = 0; row < n; row++)
+        {
+            for (int col = 0; col < n; col++)
+            {
+                if (grid[row][col] == 0)
+                    continue;
+
+                for (int ind = 0; ind < 4; ind++)
+                {
+                    int nr = row + delRow[ind], nc = col + delCol[ind];
+
+                    if (isValid(nr, nc, n) && grid[nr][nc] == 1)
+                    {
+                        int node = row * n + col, adjNode = nr * n + nc;
+
+                        ds.unite(node, adjNode);
+                    }
+                }
+            }
+        }
+    }
+
+public:
+    /*
+        @description: Find the size of the largest island that can be formed by changing at most one 0 to 1 in a binary grid
+        @param grid: The binary grid representing land (1) and water (0)
+        @return: The size of the largest island that can be formed
+        @time complexity: O(n^2) where n is the dimension of the grid
+        @space complexity: O(n^2) for the DSU data structure
+    */
+    int largestIsland(vector<vector<int>> &grid)
+    {
+        int n = grid.size();
+        DSU ds(n * n);
+        addInitialIslands(grid, ds, n);
+        int ans = 0;
+
+        for (int row = 0; row < n; row++)
+        {
+            for (int col = 0; col < n; col++)
+            {
+                if (grid[row][col] == 1)
+                    continue;
+
+                set<int> components;
+                for (int ind = 0; ind < 4; ind++)
+                {
+                    int nr = row + delRow[ind], nc = col + delCol[ind];
+
+                    if (isValid(nr, nc, n) && grid[nr][nc] == 1)
+                    {
+                        int node = nr * n + nc;
+                        components.insert(ds.findUPar(node));
+                    }
+                }
+
+                int tot = 0;
+                for (auto it : components)
+                    tot += ds.size[it];
+
+                ans = max(ans, tot + 1);
+            }
+        }
+
+        for (int cellNo = 0; cellNo < n * n; cellNo++)
+            ans = max(ans, ds.size[ds.findUPar(cellNo)]);
 
         return ans;
     }
