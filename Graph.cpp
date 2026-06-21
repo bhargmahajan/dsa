@@ -1327,402 +1327,534 @@ public:
 
         return -1;
     }
+
+    int timer = 1;
+
+    void dfs(int node, int parent, vector<int> &vis, vector<int> adj[], int tin[], int low[], vector<vector<int>> &bridges)
+    {
+        vis[node] = 1;
+        tin[node] = low[node] = timer;
+        timer++;
+
+        for (auto it : adj[node])
+        {
+            if (it == parent)
+                continue;
+
+            if (vis[it] == 0)
+            {
+                dfs(it, node, vis, adj, tin, low, bridges);
+                low[node] = min(low[node], low[it]);
+
+                if (low[it] > tin[node])
+                    bridges.push_back({it, node});
+            }
+            else
+                low[node] = min(low[node], low[it]);
+        }
+    }
+
+    /*
+        @description: Find all critical connections (bridges) in an undirected graph
+        @param n: Number of nodes in the graph
+        @param connections: List of edges in the graph
+        @return: List of all critical connections
+        @time complexity: O(V+2E) where V is the number of nodes and E is the number of edges
+        @space complexity: O(V+2E) + O(3V) for the adjacency list, visited array, and tin/low arrays
+    */
+    vector<vector<int>> criticalConnections(int n, vector<vector<int>> &connections)
+    {
+        vector<int> adj[n];
+
+        for (auto it : connections)
+        {
+            int u = it[0], v = it[1];
+
+            adj[u].push_back(v);
+            adj[v].push_back(u);
+        }
+
+        vector<int> vis(n, 0);
+        int tin[n];
+        int low[n];
+        vector<vector<int>> bridges;
+
+        dfs(0, -1, vis, adj, tin, low, bridges);
+
+        return bridges;
+    }
+
+    int tim = 1;
+    void dfsArt(int node, int parent, vector<int> &vis, int tin[], int low[], vector<int> &mark, vector<int> adj[])
+    {
+        vis[node] = 1;
+        tin[node] = low[node] = tim;
+        int child = 0;
+
+        for (auto it : adj[node])
+        {
+            if (it == parent)
+                continue;
+
+            if (!vis[it])
+            {
+                dfsArt(it, node, vis, tin, low, mark, adj);
+                low[node] = min(low[node], low[it]);
+
+                if (low[it] >= tin[node] && parent != -1)
+                    mark[node] = 1;
+
+                child++;
+            }
+            else
+                low[node] = min(low[node], tin[it]);
+        }
+
+        if (parent == -1 && child > 1)
+            mark[node] = 1;
+    }
+
+    /*
+        @description: Find all articulation points in an undirected graph
+        @param n: Number of nodes in the graph
+        @param adj: Adjacency list representing the graph
+        @return: List of all articulation points
+        @time complexity: O(V + 2E) where V is the number of nodes and E is the number of edges
+        @space complexity: O(3V) for the visited array and articulation point marker
+    */
+    vector<int>
+    articulationPoints(int n, vector<int> adj[])
+    {
+        vector<int> vis(n, 0), mark(n, 0);
+        int tin[n], low[n];
+
+        for (int i = 0; i < n; i++)
+        {
+            if (!vis[i])
+                dfsArt(i, -1, vis, tin, low, mark, adj);
+        }
+
+        vector<int> ans;
+        for (int i = 0; i < n; i++)
+        {
+            if (mark[i])
+                ans.push_back(i);
+        }
+
+        return ans.empty() ? vector<int>{-1} : ans;
+    }
 };
 
 /*
     @description: Disjoint Set Union (DSU) or Union-Find data structure implementation with union by rank and union by size optimizations
     @author: Bharg Mahajan
 */
-class DSU
-{
-    vector<int> rank, parent, size;
+// class DSU
+// {
+//     vector<int> rank, parent, size;
 
-public:
-    DSU(int n)
-    {
-        rank.resize(n + 1, 0);
-        parent.resize(n + 1);
-        size.resize(n + 1);
+// public:
+//     DSU(int n)
+//     {
+//         rank.resize(n + 1, 0);
+//         parent.resize(n + 1);
+//         size.resize(n + 1);
 
-        for (int i = 0; i <= n; i++)
-        {
-            parent[i] = i;
-            size[i] = 1;
-        }
-    }
+//         for (int i = 0; i <= n; i++)
+//         {
+//             parent[i] = i;
+//             size[i] = 1;
+//         }
+//     }
 
-    /*
-        @description: Find the ultimate parent of a node with path compression optimization
-        @param node: The node for which to find the ultimate parent
-        @return: The ultimate parent of the node
-        @time complexity: O(log N) amortized, where N is the number of nodes
-        @space complexity: O(1) for the recursive stack in path compression
-    */
-    int find(int node)
-    {
-        if (node == parent[node])
-            return node;
+//     /*
+//         @description: Find the ultimate parent of a node with path compression optimization
+//         @param node: The node for which to find the ultimate parent
+//         @return: The ultimate parent of the node
+//         @time complexity: O(log N) amortized, where N is the number of nodes
+//         @space complexity: O(1) for the recursive stack in path compression
+//     */
+//     int find(int node)
+//     {
+//         if (node == parent[node])
+//             return node;
 
-        return parent[node] = find(parent[node]);
-    }
+//         return parent[node] = find(parent[node]);
+//     }
 
-    /*
-        @description: Union two sets by rank
-        @param u: First node
-        @param v: Second node
-        @return: None
-        @time complexity: O(log N) amortized, where N is the number of nodes
-        @space complexity: O(1) for the recursive stack in path compression
-    */
-    void unionByRank(int u, int v)
-    {
-        int up = find(u);
-        int vp = find(v);
+//     /*
+//         @description: Union two sets by rank
+//         @param u: First node
+//         @param v: Second node
+//         @return: None
+//         @time complexity: O(log N) amortized, where N is the number of nodes
+//         @space complexity: O(1) for the recursive stack in path compression
+//     */
+//     void unionByRank(int u, int v)
+//     {
+//         int up = find(u);
+//         int vp = find(v);
 
-        if (up == vp)
-            return;
+//         if (up == vp)
+//             return;
 
-        if (rank[up] > rank[vp])
-            parent[vp] = up;
-        else if (rank[up] < rank[vp])
-            parent[up] = vp;
-        else
-        {
-            parent[vp] = up;
-            rank[up]++;
-        }
-    }
+//         if (rank[up] > rank[vp])
+//             parent[vp] = up;
+//         else if (rank[up] < rank[vp])
+//             parent[up] = vp;
+//         else
+//         {
+//             parent[vp] = up;
+//             rank[up]++;
+//         }
+//     }
 
-    /*
-        @description: Union two sets by size
-        @param u: First node
-        @param v: Second node
-        @return: None
-        @time complexity: O(log N) amortized, where N is the number of nodes
-        @space complexity: O(1) for the recursive stack in path compression
-    */
-    void unionBySize(int u, int v)
-    {
-        int up = find(u);
-        int vp = find(v);
+//     /*
+//         @description: Union two sets by size
+//         @param u: First node
+//         @param v: Second node
+//         @return: None
+//         @time complexity: O(log N) amortized, where N is the number of nodes
+//         @space complexity: O(1) for the recursive stack in path compression
+//     */
+//     void unionBySize(int u, int v)
+//     {
+//         int up = find(u);
+//         int vp = find(v);
 
-        if (up == vp)
-            return;
+//         if (up == vp)
+//             return;
 
-        if (size[up] < size[vp])
-        {
-            parent[up] = vp;
-            size[vp] += size[up];
-        }
-        else
-        {
-            parent[vp] = up;
-            size[up] += size[vp];
-        }
-    }
+//         if (size[up] < size[vp])
+//         {
+//             parent[up] = vp;
+//             size[vp] += size[up];
+//         }
+//         else
+//         {
+//             parent[vp] = up;
+//             size[up] += size[vp];
+//         }
+//     }
 
-    /*
-        @description: Make all computers connected with minimum number of operations
-        @param n: Number of computers
-        @param connections: List of existing connections
-        @return: Minimum number of operations required or -1 if not possible
-        @time complexity: O(N + M × α(N)) where N is the number of computers and M is the number of connections
-        @space complexity: O(N) for the parent and size arrays
-    */
-    int makeConnected(int n, vector<vector<int>> &connections)
-    {
-        if (connections.size() < n - 1)
-            return -1;
+//     /*
+//         @description: Make all computers connected with minimum number of operations
+//         @param n: Number of computers
+//         @param connections: List of existing connections
+//         @return: Minimum number of operations required or -1 if not possible
+//         @time complexity: O(N + M × α(N)) where N is the number of computers and M is the number of connections
+//         @space complexity: O(N) for the parent and size arrays
+//     */
+//     int makeConnected(int n, vector<vector<int>> &connections)
+//     {
+//         if (connections.size() < n - 1)
+//             return -1;
 
-        DSU dsu(n);
-        for (auto edge : connections)
-            dsu.unionByRank(edge[0], edge[1]);
+//         DSU dsu(n);
+//         for (auto edge : connections)
+//             dsu.unionByRank(edge[0], edge[1]);
 
-        unordered_set<int> components;
-        for (int i = 0; i < n; i++)
-            components.insert(dsu.find(i));
+//         unordered_set<int> components;
+//         for (int i = 0; i < n; i++)
+//             components.insert(dsu.find(i));
 
-        return components.size() - 1;
-    }
+//         return components.size() - 1;
+//     }
 
-    class DSUB
-    {
-    public:
-        unordered_map<int, int> parent;
+//     class DSUB
+//     {
+//     public:
+//         unordered_map<int, int> parent;
 
-        int find(int x)
-        {
-            if (parent.find(x) == parent.end())
-                parent[x] = x;
+//         int find(int x)
+//         {
+//             if (parent.find(x) == parent.end())
+//                 parent[x] = x;
 
-            if (x != parent[x])
-                parent[x] = find(parent[x]);
+//             if (x != parent[x])
+//                 parent[x] = find(parent[x]);
 
-            return parent[x];
-        }
+//             return parent[x];
+//         }
 
-        void unite(int x, int y) { parent[find(x)] = find(y); }
-    };
+//         void unite(int x, int y) { parent[find(x)] = find(y); }
+//     };
 
-    /*
-        @description: Remove maximum number of stones such that each remaining stone is isolated
-        @param stones: List of stone positions
-        @return: Maximum number of stones that can be removed
-        @time complexity: O(N × α(N)) where N is the number of stones
-        @space complexity: O(N) for the parent map
-    */
-    int removeStones(vector<vector<int>> &stones)
-    {
-        DSUB dsu;
+//     /*
+//         @description: Remove maximum number of stones such that each remaining stone is isolated
+//         @param stones: List of stone positions
+//         @return: Maximum number of stones that can be removed
+//         @time complexity: O(N × α(N)) where N is the number of stones
+//         @space complexity: O(N) for the parent map
+//     */
+//     int removeStones(vector<vector<int>> &stones)
+//     {
+//         DSUB dsu;
 
-        for (auto it : stones)
-            dsu.unite(it[0], it[1] + 10001);
+//         for (auto it : stones)
+//             dsu.unite(it[0], it[1] + 10001);
 
-        unordered_set<int> components;
-        for (auto stone : stones)
-            components.insert(dsu.find(stone[0]));
+//         unordered_set<int> components;
+//         for (auto stone : stones)
+//             components.insert(dsu.find(stone[0]));
 
-        return stones.size() - components.size();
-    }
-};
+//         return stones.size() - components.size();
+//     }
+// };
 
-class DSU
-{
-    vector<int> size, parent;
+// class DSU
+// {
+//     vector<int> size, parent;
 
-public:
-    DSU(int n)
-    {
-        parent.resize(n + 1);
-        size.resize(n + 1);
+// public:
+//     DSU(int n)
+//     {
+//         parent.resize(n + 1);
+//         size.resize(n + 1);
 
-        for (int i = 0; i <= n; i++)
-        {
-            parent[i] = i;
-            size[i] = 1;
-        }
-    }
+//         for (int i = 0; i <= n; i++)
+//         {
+//             parent[i] = i;
+//             size[i] = 1;
+//         }
+//     }
 
-    int find(int node)
-    {
-        if (node == parent[node])
-            return node;
+//     int find(int node)
+//     {
+//         if (node == parent[node])
+//             return node;
 
-        return find(parent[node]);
-    }
+//         return find(parent[node]);
+//     }
 
-    void unite(int u, int v)
-    {
-        int up = find(u), vp = find(v);
+//     void unite(int u, int v)
+//     {
+//         int up = find(u), vp = find(v);
 
-        if (up == vp)
-            return;
+//         if (up == vp)
+//             return;
 
-        if (size[up] < size[vp])
-        {
-            parent[up] = vp;
-            size[vp] += size[up];
-        }
-        else
-        {
-            parent[vp] = up;
-            size[up] = size[vp];
-        }
-    }
-};
+//         if (size[up] < size[vp])
+//         {
+//             parent[up] = vp;
+//             size[vp] += size[up];
+//         }
+//         else
+//         {
+//             parent[vp] = up;
+//             size[up] = size[vp];
+//         }
+//     }
+// };
 
-class Solution
-{
-public:
-    /*
-        @description: Merge accounts with overlapping emails
-        @param accounts: List of accounts with names and emails
-        @return: Merged accounts with sorted emails
-        @time complexity: O(N+E) + O(E*4ɑ) + O(N*(ElogE + E)) where N is the number of accounts and E is the total number of emails
-        @space complexity: O(N) for the mail map and merged emails
-    */
-    vector<vector<string>> accountsMerge(vector<vector<string>> &accounts)
-    {
-        int n = accounts.size();
-        DSU ds(n);
-        unordered_map<string, int> mailMap;
+// class Solution
+// {
+// public:
+//     /*
+//         @description: Merge accounts with overlapping emails
+//         @param accounts: List of accounts with names and emails
+//         @return: Merged accounts with sorted emails
+//         @time complexity: O(N+E) + O(E*4ɑ) + O(N*(ElogE + E)) where N is the number of accounts and E is the total number of emails
+//         @space complexity: O(N) for the mail map and merged emails
+//     */
+//     vector<vector<string>> accountsMerge(vector<vector<string>> &accounts)
+//     {
+//         int n = accounts.size();
+//         DSU ds(n);
+//         unordered_map<string, int> mailMap;
 
-        for (int i = 0; i < n; i++)
-        {
-            for (int j = 1; j < accounts[i].size(); j++)
-            {
-                string mail = accounts[i][j];
+//         for (int i = 0; i < n; i++)
+//         {
+//             for (int j = 1; j < accounts[i].size(); j++)
+//             {
+//                 string mail = accounts[i][j];
 
-                if (mailMap.find(mail) == mailMap.end())
-                    mailMap[mail] = i;
-                else
-                    ds.unite(i, mailMap[mail]);
-            }
-        }
+//                 if (mailMap.find(mail) == mailMap.end())
+//                     mailMap[mail] = i;
+//                 else
+//                     ds.unite(i, mailMap[mail]);
+//             }
+//         }
 
-        vector<string> mailMerge[n];
-        for (auto it : mailMap)
-        {
-            string mail = it.first;
-            int node = ds.find(it.second);
-            mailMerge[node].push_back(mail);
-        }
+//         vector<string> mailMerge[n];
+//         for (auto it : mailMap)
+//         {
+//             string mail = it.first;
+//             int node = ds.find(it.second);
+//             mailMerge[node].push_back(mail);
+//         }
 
-        vector<vector<string>> ans;
-        for (int i = 0; i < n; i++)
-        {
-            if (mailMerge[i].empty())
-                continue;
+//         vector<vector<string>> ans;
+//         for (int i = 0; i < n; i++)
+//         {
+//             if (mailMerge[i].empty())
+//                 continue;
 
-            sort(mailMerge[i].begin(), mailMerge[i].end());
-            vector<string> temp;
-            temp.push_back(accounts[i][0]);
+//             sort(mailMerge[i].begin(), mailMerge[i].end());
+//             vector<string> temp;
+//             temp.push_back(accounts[i][0]);
 
-            for (auto mail : mailMerge[i])
-                temp.push_back(mail);
+//             for (auto mail : mailMerge[i])
+//                 temp.push_back(mail);
 
-            ans.push_back(temp);
-        }
+//             ans.push_back(temp);
+//         }
 
-        sort(ans.begin(), ans.end());
+//         sort(ans.begin(), ans.end());
 
-        return ans;
-    }
-};
+//         return ans;
+//     }
+// };
 
-class LargeIsland
-{
-    class DSU
-    {
-    public:
-        vector<int> parent, size;
+// class LargeIsland
+// {
+//     class DSU
+//     {
+//     public:
+//         vector<int> parent, size;
 
-        DSU(int n)
-        {
-            parent.resize(n + 1);
-            size.resize(n + 1);
-            for (int i = 0; i <= n; i++)
-            {
-                parent[i] = i;
-                size[i] = 1;
-            }
-        }
+//         DSU(int n)
+//         {
+//             parent.resize(n + 1);
+//             size.resize(n + 1);
+//             for (int i = 0; i <= n; i++)
+//             {
+//                 parent[i] = i;
+//                 size[i] = 1;
+//             }
+//         }
 
-        int findUPar(int node)
-        {
-            if (node == parent[node])
-                return node;
-            return parent[node] = findUPar(parent[node]);
-        }
+//         int findUPar(int node)
+//         {
+//             if (node == parent[node])
+//                 return node;
+//             return parent[node] = findUPar(parent[node]);
+//         }
 
-        void unite(int u, int v)
-        {
-            int ulp_u = findUPar(u);
-            int ulp_v = findUPar(v);
+//         void unite(int u, int v)
+//         {
+//             int ulp_u = findUPar(u);
+//             int ulp_v = findUPar(v);
 
-            if (ulp_u == ulp_v)
-                return;
+//             if (ulp_u == ulp_v)
+//                 return;
 
-            if (size[ulp_u] < size[ulp_v])
-            {
-                parent[ulp_u] = ulp_v;
-                size[ulp_v] += size[ulp_u];
-            }
-            else
-            {
-                parent[ulp_v] = ulp_u;
-                size[ulp_u] += size[ulp_v];
-            }
-        }
-    };
+//             if (size[ulp_u] < size[ulp_v])
+//             {
+//                 parent[ulp_u] = ulp_v;
+//                 size[ulp_v] += size[ulp_u];
+//             }
+//             else
+//             {
+//                 parent[ulp_v] = ulp_u;
+//                 size[ulp_u] += size[ulp_v];
+//             }
+//         }
+//     };
 
-    vector<int> delRow = {-1, 0, 1, 0};
-    vector<int> delCol = {0, 1, 0, -1};
+//     vector<int> delRow = {-1, 0, 1, 0};
+//     vector<int> delCol = {0, 1, 0, -1};
 
-    bool isValid(int &i, int &j, int &n)
-    {
-        if (i < 0 || i >= n)
-            return false;
-        if (j < 0 || j >= n)
-            return false;
+//     bool isValid(int &i, int &j, int &n)
+//     {
+//         if (i < 0 || i >= n)
+//             return false;
+//         if (j < 0 || j >= n)
+//             return false;
 
-        return true;
-    }
+//         return true;
+//     }
 
-    void addInitialIslands(vector<vector<int>> grid, DSU &ds, int n)
-    {
-        for (int row = 0; row < n; row++)
-        {
-            for (int col = 0; col < n; col++)
-            {
-                if (grid[row][col] == 0)
-                    continue;
+//     void addInitialIslands(vector<vector<int>> grid, DSU &ds, int n)
+//     {
+//         for (int row = 0; row < n; row++)
+//         {
+//             for (int col = 0; col < n; col++)
+//             {
+//                 if (grid[row][col] == 0)
+//                     continue;
 
-                for (int ind = 0; ind < 4; ind++)
-                {
-                    int nr = row + delRow[ind], nc = col + delCol[ind];
+//                 for (int ind = 0; ind < 4; ind++)
+//                 {
+//                     int nr = row + delRow[ind], nc = col + delCol[ind];
 
-                    if (isValid(nr, nc, n) && grid[nr][nc] == 1)
-                    {
-                        int node = row * n + col, adjNode = nr * n + nc;
+//                     if (isValid(nr, nc, n) && grid[nr][nc] == 1)
+//                     {
+//                         int node = row * n + col, adjNode = nr * n + nc;
 
-                        ds.unite(node, adjNode);
-                    }
-                }
-            }
-        }
-    }
+//                         ds.unite(node, adjNode);
+//                     }
+//                 }
+//             }
+//         }
+//     }
 
-public:
-    /*
-        @description: Find the size of the largest island that can be formed by changing at most one 0 to 1 in a binary grid
-        @param grid: The binary grid representing land (1) and water (0)
-        @return: The size of the largest island that can be formed
-        @time complexity: O(n^2) where n is the dimension of the grid
-        @space complexity: O(n^2) for the DSU data structure
-    */
-    int largestIsland(vector<vector<int>> &grid)
-    {
-        int n = grid.size();
-        DSU ds(n * n);
-        addInitialIslands(grid, ds, n);
-        int ans = 0;
+// public:
+//     /*
+//         @description: Find the size of the largest island that can be formed by changing at most one 0 to 1 in a binary grid
+//         @param grid: The binary grid representing land (1) and water (0)
+//         @return: The size of the largest island that can be formed
+//         @time complexity: O(n^2) where n is the dimension of the grid
+//         @space complexity: O(n^2) for the DSU data structure
+//     */
+//     int largestIsland(vector<vector<int>> &grid)
+//     {
+//         int n = grid.size();
+//         DSU ds(n * n);
+//         addInitialIslands(grid, ds, n);
+//         int ans = 0;
 
-        for (int row = 0; row < n; row++)
-        {
-            for (int col = 0; col < n; col++)
-            {
-                if (grid[row][col] == 1)
-                    continue;
+//         for (int row = 0; row < n; row++)
+//         {
+//             for (int col = 0; col < n; col++)
+//             {
+//                 if (grid[row][col] == 1)
+//                     continue;
 
-                set<int> components;
-                for (int ind = 0; ind < 4; ind++)
-                {
-                    int nr = row + delRow[ind], nc = col + delCol[ind];
+//                 set<int> components;
+//                 for (int ind = 0; ind < 4; ind++)
+//                 {
+//                     int nr = row + delRow[ind], nc = col + delCol[ind];
 
-                    if (isValid(nr, nc, n) && grid[nr][nc] == 1)
-                    {
-                        int node = nr * n + nc;
-                        components.insert(ds.findUPar(node));
-                    }
-                }
+//                     if (isValid(nr, nc, n) && grid[nr][nc] == 1)
+//                     {
+//                         int node = nr * n + nc;
+//                         components.insert(ds.findUPar(node));
+//                     }
+//                 }
 
-                int tot = 0;
-                for (auto it : components)
-                    tot += ds.size[it];
+//                 int tot = 0;
+//                 for (auto it : components)
+//                     tot += ds.size[it];
 
-                ans = max(ans, tot + 1);
-            }
-        }
+//                 ans = max(ans, tot + 1);
+//             }
+//         }
 
-        for (int cellNo = 0; cellNo < n * n; cellNo++)
-            ans = max(ans, ds.size[ds.findUPar(cellNo)]);
+//         for (int cellNo = 0; cellNo < n * n; cellNo++)
+//             ans = max(ans, ds.size[ds.findUPar(cellNo)]);
 
-        return ans;
-    }
-};
+//         return ans;
+//     }
+// };
 
 int main()
 {
+    int n = 5;
+    vector<vector<int>> edges = {
+        {0, 1}, {1, 4}, {2, 4}, {2, 3}, {3, 4}};
+
+    vector<int> adj[n];
+    for (auto e : edges)
+    {
+        adj[e[0]].push_back(e[1]);
+        adj[e[1]].push_back(e[0]);
+    }
+
+    Graph sol;
+    vector<int> res = sol.articulationPoints(n, adj);
+    for (int v : res)
+        cout << v << " ";
+    cout << endl;
     return 0;
 }
