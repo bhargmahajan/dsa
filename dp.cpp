@@ -363,19 +363,436 @@ public:
 
         return prev[k];
     }
+
+    /*
+     * @brief Checks if the array can be partitioned into two subsets with equal sum
+     * @param nums The array of integers
+     * @return True if the array can be partitioned into two subsets with equal sum, false otherwise
+     * @time complexity: O(n * k) where n is the number of elements and k is half of the total sum
+     * @space complexity: O(k)
+     */
+    bool canPartition(vector<int> &nums)
+    {
+        int tot = 0, n = nums.size();
+        for (int i = 0; i < n; i++)
+            tot += nums[i];
+
+        if (tot % 2 == 1)
+            return false;
+
+        int k = tot / 2;
+        vector<bool> prev(k + 1, false);
+        prev[0] = true;
+        if (nums[0] <= k)
+            prev[nums[0]] = true;
+
+        for (int index = 1; index < n; index++)
+        {
+            vector<bool> curr(k + 1, false);
+            curr[0] = true;
+            for (int target = 1; target <= k; target++)
+            {
+                bool notTaken = prev[target], taken = false;
+                if (nums[index] <= target)
+                    taken = prev[target - nums[index]];
+
+                curr[target] = taken || notTaken;
+            }
+
+            prev = curr;
+        }
+
+        return prev[k];
+    }
+
+    /*
+     * @brief Counts the number of subsets with the given target sum
+     * @param arr The array of integers
+     * @param k The target sum
+     * @return The number of subsets with the given target sum
+     * @time complexity: O(n * k)
+     * @space complexity: O(k)
+     */
+    int countSubsets(vector<int> &arr, int k)
+    {
+        vector<int> dp(k + 1, 0);
+        dp[0] = 1;
+
+        if (arr[0] <= k)
+            dp[arr[0]] += 1;
+
+        for (int i = 1; i < arr.size(); i++)
+        {
+            vector<int> curr(k + 1, 0);
+            curr[0] = 1;
+
+            for (int j = 1; j <= k; j++)
+            {
+                int notTake = dp[j], take = 0;
+                if (arr[i] <= j)
+                    take = dp[j - arr[i]];
+                curr[j] = take + notTake;
+            }
+            dp = curr;
+        }
+
+        return dp[k];
+    }
+
+    /*
+     * @brief Counts the number of partitions with the given target difference
+     * @param arr The array of integers
+     * @param d The target difference
+     * @return The number of partitions with the given target difference
+     * @time complexity: O(n * k)
+     * @space complexity: O(k)
+     */
+    int countPartitions(vector<int> &arr, int d)
+    {
+        int totalSum = accumulate(arr.begin(), arr.end(), 0);
+        if ((totalSum + d) % 2 != 0 || d > totalSum)
+            return 0;
+
+        int k = (totalSum + d) / 2;
+        vector<int> dp(k + 1, 0);
+        dp[0] = 1;
+
+        if (arr[0] <= k)
+            dp[arr[0]] += 1;
+
+        for (int i = 1; i < arr.size(); i++)
+        {
+            vector<int> curr(k + 1, 0);
+            curr[0] = 1;
+
+            for (int j = 1; j <= k; j++)
+            {
+                int notTake = dp[j], take = 0;
+                if (arr[i] <= j)
+                    take = dp[j - arr[i]];
+                curr[j] = take + notTake;
+            }
+            dp = curr;
+        }
+
+        return dp[k];
+    }
+
+    /*
+     * @brief Counts the number of ways with the given target sum
+     * @param nums The array of integers
+     * @param target The target sum
+     * @return The number of ways with the given target sum
+     * @time complexity: O(n * k)
+     * @space complexity: O(k)
+     */
+    int findTargetSumWays(vector<int> &nums, int target)
+    {
+        int total = accumulate(nums.begin(), nums.end(), 0);
+        if ((total + target) % 2 != 0 || abs(target) > total)
+            return 0;
+
+        int newTarget = (total + target) / 2;
+        vector<int> dp(newTarget + 1, 0);
+        dp[0] = 1;
+
+        for (int num : nums)
+        {
+            for (int j = newTarget; j >= num; j--)
+                dp[j] += dp[j - num];
+        }
+
+        return dp[newTarget];
+    }
+
+    /*
+     * @brief Counts the number of ways with the given target amount
+     * @param coins The array of integers
+     * @param amount The target amount
+     * @return The number of ways with the given target amount
+     * @time complexity: O(n * k)
+     * @space complexity: O(k)
+     */
+    int change(int amount, vector<int> &coins)
+    {
+        int n = coins.size();
+        vector<int> prev(amount + 1, 0);
+        for (int i = 0; i <= amount; i++)
+        {
+            if (i % coins[0] == 0)
+                prev[i] = 1;
+        }
+
+        for (int i = 1; i < n; i++)
+        {
+            vector<int> curr(amount + 1, 0);
+            for (int j = 0; j <= amount; j++)
+            {
+                long notTake = prev[j], take = 0;
+                if (coins[i] <= j)
+                    take = curr[j - coins[i]];
+
+                curr[j] = notTake + take;
+            }
+
+            prev = curr;
+        }
+
+        return prev[amount];
+    }
+
+    /*
+     * @brief Counts the number of items the thief can rob at max
+     * @param n The size of array of items
+     * @param W The total size of knapsack
+     * @param val The array that stores the profit of each item
+     * @param wt The array that stores the weights of each object
+     * @return The maximum profit the thief can obtain by stealing
+     * @time complexity: O(n * W)
+     * @space complexity: O(W)
+     */
+    int unboundedKnapsack(int n, int W, vector<int> &val, vector<int> &wt)
+    {
+        vector<int> curr(W + 1, 0);
+        for (int i = wt[0]; i <= W; i++)
+            curr[i] = (i / wt[0]) * val[0];
+
+        for (int i = 1; i < n; i++)
+        {
+            for (int j = 0; j <= W; j++)
+            {
+                int notTake = curr[j], take = INT_MIN;
+                if (wt[i] <= j)
+                    take = val[i] + curr[j - wt[i]];
+
+                curr[j] = max(take, notTake);
+            }
+        }
+
+        return curr[W];
+    }
+
+    /*
+     * @brief Print the longest common subsequence
+     * @param text1 first string
+     * @param text2 Second string
+     * @return LCS
+     * @time complexity: O(n * n) + O(n + m)
+     * @space complexity: O(n * m)
+     */
+    string longestCommonSubsequence(string &text1, string &text2)
+    {
+        int n = text1.size(), m = text2.size();
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (text1[i - 1] == text2[j - 1])
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                else
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+
+        int i = n, j = m;
+        string ans = "";
+        while (i > 0 && j > 0)
+        {
+            if (text1[i - 1] == text2[j - 1])
+            {
+                ans += text1[i - 1];
+                i--;
+                j--;
+            }
+            else if (dp[i - 1][j] > dp[i][j - 1])
+                i--;
+            else
+                j--;
+        }
+
+        reverse(ans.begin(), ans.end());
+        return ans;
+    }
+
+    /*
+     * @brief Calculates the length of the longest common substring
+     * @param str1 First string
+     * @param str2 Second string
+     * @return Length of the longest common substring
+     * @time complexity: O(n * m)
+     * @space complexity: O(m)
+     */
+    int longestCommonSubstr(string str1, string str2)
+    {
+        int n = str1.size(), m = str2.size();
+        vector<int> prev(m + 1, 0), curr(m + 1, 0);
+        int ans = 0;
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (str1[i - 1] == str2[j - 1])
+                {
+                    curr[j] = 1 + prev[j - 1];
+                    ans = max(ans, curr[j]);
+                }
+                else
+                {
+                    curr[j] = 0;
+                }
+            }
+            prev = curr;
+        }
+
+        return ans;
+    }
+
+    int lcs(string str1, string str2)
+    {
+        int n = str1.size(), m = str2.size();
+        vector<int> prev(m + 1, 0), curr(m + 1, 0);
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (str1[i - 1] == str2[j - 1])
+                {
+                    curr[j] = 1 + prev[j - 1];
+                }
+                else
+                {
+                    curr[j] = max(prev[j], curr[j - 1]);
+                }
+            }
+            prev = curr;
+        }
+
+        return prev[m];
+    }
+
+    /*
+     * @brief Calculates the length of the longest palindromic subsequence
+     * @param s Input string
+     * @return Length of the longest palindromic subsequence
+     * @time complexity: O(n*m)
+     * @space complexity: O(m)
+     */
+    int longestPalindromeSubseq(string s)
+    {
+        string t = s;
+        reverse(s.begin(), s.end());
+
+        return lcs(s, t);
+    }
+
+    int lcs(string str1, string str2)
+    {
+        int n = str1.size(), m = str2.size();
+        vector<int> prev(m + 1, 0), curr(m + 1, 0);
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (str1[i - 1] == str2[j - 1])
+                {
+                    curr[j] = 1 + prev[j - 1];
+                }
+                else
+                {
+                    curr[j] = max(prev[j], curr[j - 1]);
+                }
+            }
+            prev = curr;
+        }
+
+        return prev[m];
+    }
+
+    /*
+     * @brief Calculates the minimum number of insertions needed to make a string palindrome
+     * @param s Input string
+     * @return Minimum number of insertions
+     * @time complexity: O(n*n)
+     * @space complexity: O(n)
+     */
+    int minInsertions(string s)
+    {
+        string t = s;
+        reverse(s.begin(), s.end());
+        return s.size() - lcs(s, t);
+    }
+
+    /*
+     * @brief Calculates the maximum profit from buying and selling stocks
+     * @param prices Vector of stock prices
+     * @return Maximum profit
+     * @time complexity: O(2n)
+     * @space complexity: O(1)
+     */
+    int maxProfit(vector<int> &prices)
+    {
+        vector<long> ahead(2, 0), curr(2, 0);
+        ahead[0] = ahead[1] = 0;
+
+        for (int i = prices.size() - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= 1; j++)
+            {
+                if (j == 0)
+                    curr[j] = max(0 + ahead[0], -prices[i] + ahead[1]);
+                if (j == 1)
+                    curr[j] = max(0 + ahead[1], prices[i] + ahead[0]);
+            }
+            ahead = curr;
+        }
+
+        return curr[0];
+    }
+
+    /*
+     * @brief Calculates the maximum profit from buying and selling stocks with at most two transactions
+     * @param prices Vector of stock prices
+     * @return Maximum profit
+     * @time complexity: O(6n)
+     * @space complexity: O(1)
+     */
+    int maxProfit2(vector<int> &prices)
+    {
+        vector<vector<int>> ahead(2, vector<int>(3, 0)),
+            curr(2, vector<int>(3, 0));
+
+        for (int i = prices.size() - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= 1; j++)
+            {
+                for (int c = 1; c <= 2; c++)
+                {
+                    if (j == 0)
+                        curr[j][c] =
+                            max(0 + ahead[0][c], -prices[i] + ahead[1][c]);
+                    if (j == 1)
+                        curr[j][c] =
+                            max(0 + ahead[1][c], prices[i] + ahead[0][c - 1]);
+                }
+            }
+            ahead = curr;
+        }
+
+        return curr[0][2];
+    }
 };
 
 int main()
 {
     DP dp;
-    vector<int> arr = {1, 2, 3, 4};
-    int k = 4;
-    int n = arr.size();
+    string s1 = "abcjklp";
+    string s2 = "acjkp";
 
-    if (dp.subsetSumToK(n, k, arr))
-        cout << "Subset with the given target found";
-    else
-        cout << "Subset with the given target not found";
+    cout << "The Length of Longest Common Substring is " << dp.longestCommonSubstr(s1, s2) << endl;
 
     return 0;
 }
