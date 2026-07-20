@@ -649,7 +649,7 @@ public:
         return ans;
     }
 
-    int lcs(string str1, string str2)
+    int lcs1(string str1, string str2)
     {
         int n = str1.size(), m = str2.size();
         vector<int> prev(m + 1, 0), curr(m + 1, 0);
@@ -685,10 +685,10 @@ public:
         string t = s;
         reverse(s.begin(), s.end());
 
-        return lcs(s, t);
+        return lcs1(s, t);
     }
 
-    int lcs(string str1, string str2)
+    int lcs2(string str1, string str2)
     {
         int n = str1.size(), m = str2.size();
         vector<int> prev(m + 1, 0), curr(m + 1, 0);
@@ -723,7 +723,216 @@ public:
     {
         string t = s;
         reverse(s.begin(), s.end());
-        return s.size() - lcs(s, t);
+        return s.size() - lcs1(s, t);
+    }
+
+    /*
+     * @brief Calculates the minimum edit distance between two strings
+     * @param word1 First string
+     * @param word2 Second string
+     * @return Minimum edit distance
+     * @time complexity: O(n*m)
+     * @space complexity: O(m)
+     */
+    int minDistance(string word1, string word2)
+    {
+        int n = word1.size(), m = word2.size();
+        vector<int> prev(m + 1, 0), curr(m + 1, 0);
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (word1[i - 1] == word2[j - 1])
+                    curr[j] = 1 + prev[j - 1];
+                else
+                    curr[j] = max(prev[j], curr[j - 1]);
+            }
+
+            prev = curr;
+        }
+
+        int lcs = prev[m];
+        return (m - lcs) + (n - lcs);
+    }
+
+    /*
+     * @brief Calculates the shortest common supersequence of two strings
+     * @param str1 First string
+     * @param str2 Second string
+     * @return Shortest common supersequence
+     * @time complexity: O(n*m)
+     * @space complexity: O(n*m)
+     */
+    string shortestCommonSupersequence(string str1, string str2)
+    {
+        int n = str1.size(), m = str2.size();
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
+        for (int i = 0; i <= n; i++)
+            dp[i][0] = 0;
+
+        for (int i = 0; i <= m; i++)
+            dp[0][i] = 0;
+
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= m; j++)
+            {
+                if (str1[i - 1] == str2[j - 1])
+                    dp[i][j] = 1 + dp[i - 1][j - 1];
+                else
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
+
+        int i = n, j = m;
+        string ans = "";
+        while (i > 0 && j > 0)
+        {
+            if (str1[i - 1] == str2[j - 1])
+            {
+                ans += str1[i - 1];
+                i--;
+                j--;
+            }
+            else if (dp[i - 1][j] > dp[i][j - 1])
+            {
+                ans += str1[i - 1];
+                i--;
+            }
+            else
+            {
+                ans += str2[j - 1];
+                j--;
+            }
+        }
+
+        while (i > 0)
+        {
+            ans += str1[i - 1];
+            i--;
+        }
+
+        while (j > 0)
+        {
+            ans += str2[j - 1];
+            j--;
+        }
+
+        reverse(ans.begin(), ans.end());
+
+        return ans;
+    }
+
+    /*
+     * @brief Counts the number of distinct subsequences of string s that equals string t
+     * @param s The source string
+     * @param t The target string
+     * @return The number of distinct subsequences
+     * @time complexity: O(n*m)
+     * @space complexity: O(m)
+     */
+    int numDistinct(string s, string t)
+    {
+        int n = s.size(), m = t.size();
+        vector<unsigned long long> dp(m + 1, 0);
+        dp[m] = 1;
+
+        for (int i = n - 1; i >= 0; i--)
+        {
+            vector<unsigned long long> curr = dp;
+            for (int j = m - 1; j >= 0; j--)
+            {
+                if (s[i] == t[j])
+                    curr[j] = dp[j + 1] + dp[j];
+                else
+                    curr[j] = dp[j];
+            }
+
+            dp = curr;
+        }
+
+        return (int)dp[0];
+    }
+
+    /*
+     * @brief Calculates the minimum edit distance between two strings
+     * @param word1 First string
+     * @param word2 Second string
+     * @return Minimum edit distance
+     * @time complexity: O(n*m)
+     * @space complexity: O(m)
+     */
+    int minDistance1(string word1, string word2)
+    {
+        int n = word1.size(), m = word2.size();
+        if (m == 0 && n != 0)
+            return n;
+
+        if (n == 0 && m != 0)
+            return m;
+
+        vector<int> prev(m + 1, 0), curr(m + 1, 0);
+        for (int j = 0; j <= m; j++)
+            prev[j] = j;
+
+        for (int i = 1; i <= n; i++)
+        {
+            curr[0] = i;
+
+            for (int j = 1; j <= m; j++)
+            {
+                if (word1[i - 1] == word2[j - 1])
+                    curr[j] = prev[j - 1];
+                else
+                    curr[j] = 1 + min(prev[j - 1], min(prev[j], curr[j - 1]));
+            }
+
+            prev = curr;
+        }
+
+        return curr[m];
+    }
+
+    /*
+     * @brief Determines if a string matches a pattern with wildcard characters
+     * @param s The input string
+     * @param p The pattern string
+     * @return True if the string matches the pattern, false otherwise
+     * @time complexity: O(n*m)
+     * @space complexity: O(m)
+     */
+    bool isMatch(string s, string p)
+    {
+        int n = s.size(), m = p.size();
+        vector<bool> prev(m + 1, false), curr(m + 1, false);
+        prev[0] = true;
+
+        for (int j = 1; j <= m; j++)
+        {
+            if (p[j - 1] == '*')
+                prev[j] = prev[j - 1];
+            else
+                break;
+        }
+
+        for (int i = 1; i <= n; i++)
+        {
+            curr[0] = false;
+
+            for (int j = 1; j <= m; j++)
+            {
+                if (p[j - 1] == s[i - 1] || p[j - 1] == '?')
+                    curr[j] = prev[j - 1];
+                else if (p[j - 1] == '*')
+                    curr[j] = prev[j] || curr[j - 1];
+                else
+                    curr[j] = false;
+            }
+
+            prev = curr;
+        }
+
+        return prev[m];
     }
 
     /*
@@ -772,11 +981,9 @@ public:
                 for (int c = 1; c <= 2; c++)
                 {
                     if (j == 0)
-                        curr[j][c] =
-                            max(0 + ahead[0][c], -prices[i] + ahead[1][c]);
+                        curr[j][c] = max(0 + ahead[0][c], -prices[i] + ahead[1][c]);
                     if (j == 1)
-                        curr[j][c] =
-                            max(0 + ahead[1][c], prices[i] + ahead[0][c - 1]);
+                        curr[j][c] = max(0 + ahead[1][c], prices[i] + ahead[0][c - 1]);
                 }
             }
             ahead = curr;
@@ -784,15 +991,159 @@ public:
 
         return curr[0][2];
     }
+
+    /*
+     * @brief Calculates the maximum profit from buying and selling stocks with at most two transactions
+     * @param prices Vector of stock prices
+     * @return Maximum profit
+     * @time complexity: O(6n)
+     * @space complexity: O(1)
+     */
+    int maxProfit3(vector<int> &prices)
+    {
+        int n = prices.size();
+        vector<int> cur(2, 0), front1(2, 0), front2(2, 0);
+        for (int i = n - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= 1; j++)
+            {
+                int profit = 0;
+                if (j == 0)
+                    profit = max(0 + front1[0], -prices[i] + front1[1]);
+                if (j == 1)
+                    profit = max(0 + front1[1], prices[i] + front2[0]);
+
+                cur[j] = profit;
+            }
+
+            front2 = front1;
+            front1 = cur;
+        }
+
+        return cur[0];
+    }
+
+    /*
+     * @brief Calculates the maximum profit from buying and selling stocks with a transaction fee
+     * @param prices Vector of stock prices
+     * @param fee Transaction fee
+     * @return Maximum profit
+     * @time complexity: O(2n)
+     * @space complexity: O(1)
+     */
+    int maxProfit4(vector<int> &prices, int fee)
+    {
+        int n = prices.size();
+        if (n == 0)
+            return 0;
+
+        vector<int> cur(2, 0), ahead(2, 0);
+        ahead[0] = ahead[1] = 0;
+        long profit;
+
+        for (int i = n - 1; i >= 0; i--)
+        {
+            for (int j = 0; j <= 1; j++)
+            {
+                if (j == 0)
+                    profit = max(0 + ahead[0], -prices[i] + ahead[1]);
+                if (j == 1)
+                    profit = max(0 + ahead[1], prices[i] - fee + ahead[0]);
+
+                cur[j] = profit;
+            }
+
+            ahead = cur;
+        }
+
+        return cur[0];
+    }
+
+    /*
+     * @brief Calculates the length of the longest increasing subsequence
+     * @param nums Vector of integers
+     * @return Length of the longest increasing subsequence
+     * @time complexity: O(n log n)
+     * @space complexity: O(n)
+     */
+    int LIS(vector<int> &nums)
+    {
+        int n = nums.size();
+        vector<int> temp;
+        temp.push_back(nums[0]);
+
+        for (int i = 1; i < n; i++)
+        {
+            if (nums[i] > temp.back())
+                temp.push_back(nums[i]);
+            else
+            {
+                int ind = lower_bound(temp.begin(), temp.end(), nums[i]) - temp.begin();
+                temp[ind] = nums[i];
+            }
+        }
+
+        return temp.size();
+    }
+
+    /*
+     * @brief Print the longest increasing subsequence
+     * @param nums Vector of integers
+     * @return Vector containing the longest increasing subsequence
+     * @time complexity: O(n*n)
+     * @space complexity: O(n)
+    */
+    vector<int> longestIncreasingSubsequence(vector<int> &nums)
+    {
+        int n = nums.size();
+        vector<int> prev(n, -1), dp(n, 1);
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                if (nums[j] < nums[i] && dp[j] + 1 > dp[i])
+                {
+                    dp[i] = dp[j] + 1;
+                    prev[i] = j;
+                }
+            }
+        }
+
+        int maxL = 0, maxInd = 0;
+        for (int i = 0; i < n; i++)
+        {
+            if (dp[i] > maxL)
+            {
+                maxL = dp[i];
+                maxInd = i;
+            }
+        }
+
+        vector<int> lis;
+        int curr = maxInd;
+        while (curr != -1)
+        {
+            lis.push_back(nums[curr]);
+            curr = prev[curr];
+        }
+
+        reverse(lis.begin(), lis.end());
+
+        return lis;
+    }
 };
 
 int main()
 {
     DP dp;
-    string s1 = "abcjklp";
-    string s2 = "acjkp";
+    vector<int> nums = {10, 9, 2, 5, 3, 7, 101, 18};
 
-    cout << "The Length of Longest Common Substring is " << dp.longestCommonSubstr(s1, s2) << endl;
+    vector<int> lis = dp.longestIncreasingSubsequence(nums);
+
+    cout << "LIS: ";
+    for (int x : lis)
+        cout << x << " ";
+    cout << endl;
 
     return 0;
 }
