@@ -1,8 +1,8 @@
-#include<iostream>
+#include <iostream>
 #include "basicMaths.hpp"
 
-int main() {
-    vector<int> vec = {1, 2, 3, 4, 5};
-    printVector(vec);
+int main()
+{
+    BasicMaths bm;
     return 0;
 }
