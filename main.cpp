@@ -1,12 +1,9 @@
-#include <iostream>
-#include "basicMaths.hpp"
+#include "MathsProblems.hpp"
+#include "ArrayProblems.hpp"
 
 int main()
 {
-    BasicMaths bm;
-    bm.isArmstrong(2) ? cout << "Yes" : cout << "No";
-    bm.isArmstrong(200) ? cout << "Yes" : cout << "No";
-    bm.isArmstrong(153) ? cout << "Yes" : cout << "No";
+    ArrayProblems ap;
 
     return 0;
 }

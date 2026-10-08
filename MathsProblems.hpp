@@ -1,13 +1,15 @@
-#define BASICMATHS_H
+#ifndef MATHSPROBLEMS_H
+#define MATHSPROBLEMS_H
+
 #include <bits/stdc++.h>
 
 using namespace std;
 
 /*
  * @author: Bharg Mahajan
- * @description: This class contains basic maths functions.
+ * @description: This class contains maths functions.
  */
-class BasicMaths
+class MathsProblems
 {
 public:
     /*
@@ -302,3 +304,5 @@ public:
         return div;
     }
 };
+
+#endif
