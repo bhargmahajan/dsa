@@ -70,7 +70,14 @@ public:
         return true;
     }
 
-    void reverse(int arr[], int n)
+    /*
+     * @brief Reverses the elements of an array in place.
+     * @param arr The array of integers.
+     * @param n The number of elements in the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void reverseArray(int arr[], int n)
     {
         int i = 0, j = n - 1;
 
@@ -80,6 +87,126 @@ public:
             i++;
             j--;
         }
+    }
+
+    /*
+     * @brief Performs a linear search for a target value in an array.
+     * @param nums The array of integers.
+     * @param target The value to search for.
+     * @return The index of the target value if found, otherwise -1.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int linearSearch(vector<int> &nums, int target)
+    {
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] == target)
+                return i;
+        }
+
+        return -1;
+    }
+
+    /*
+     * @brief Finds the largest element in an array.
+     * @param nums The array of integers.
+     * @return The largest element in the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int largestElement(vector<int> &nums)
+    {
+        int res = INT_MIN;
+
+        for (int it : nums)
+        {
+            if (it > res)
+                res = it;
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Finds the second largest element in an array.
+     * @param nums The array of integers.
+     * @return The second largest element in the array. If there is no second largest element, returns -1.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int secondLargestElement(vector<int> &nums)
+    {
+        int scnd = INT_MIN, first = INT_MIN;
+
+        for (int it : nums)
+        {
+            if (it > first)
+            {
+                scnd = first;
+                first = it;
+            }
+            else if (it < first && it > scnd)
+                scnd = it;
+        }
+
+        return scnd == INT_MIN ? -1 : scnd;
+    }
+
+    /*
+     * @brief Finds the maximum number of consecutive 1's in a binary array.
+     * @param nums The binary array (containing only 0's and 1's).
+     * @return The maximum number of consecutive 1's in the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int findMaxConsecutiveOnes(vector<int> &nums)
+    {
+        int res = 0, cnt = 0;
+
+        for (int it : nums)
+        {
+            if (it == 1)
+            {
+                cnt++;
+                res = max(res, cnt);
+            }
+            else
+                cnt = 0;
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Rotates an array to the left by one position.
+     * @param nums The array of integers.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void rotateArrayByOne(vector<int> &nums)
+    {
+        int temp = nums[0];
+
+        for (int i = 1; i < nums.size(); i++)
+            nums[i - 1] = nums[i];
+
+        nums[nums.size() - 1] = temp;
+    }
+
+    /*
+     * @brief Rotates an array to the right by k positions.
+     * @param nums The array of integers.
+     * @param k The number of positions to rotate the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void rotateArray(vector<int> &nums, int k)
+    {
+        k = k % nums.size();
+        reverse(nums.begin(), nums.begin() + k);
+        reverse(nums.begin() + k, nums.end());
+        reverse(nums.begin(), nums.end());
     }
 };
 
