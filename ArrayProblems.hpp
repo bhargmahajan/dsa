@@ -208,6 +208,148 @@ public:
         reverse(nums.begin() + k, nums.end());
         reverse(nums.begin(), nums.end());
     }
+
+    /*
+     * @brief Moves all zeroes in an array to the end while maintaining the relative order of non-zero elements.
+     * @param nums The array of integers.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void moveZeroes(vector<int> &nums)
+    {
+        int j = 0;
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] != 0)
+            {
+                swap(nums[i], nums[j]);
+                j++;
+            }
+        }
+    }
+
+    /*
+     * @brief Removes duplicates from a sorted array in place and returns the new length of the array.
+     * @param nums The sorted array of integers.
+     * @return The new length of the array after removing duplicates.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int removeDuplicates(vector<int> &nums)
+    {
+        int j = 0;
+        for (int i = 1; i < nums.size(); i++)
+        {
+            if (nums[i] != nums[j])
+            {
+                j++;
+                nums[j] = nums[i];
+            }
+        }
+
+        return j + 1;
+    }
+
+    /*
+     * @brief Finds the missing number in an array containing numbers from 0 to n.
+     * @param nums The array of integers containing numbers from 0 to n with one number missing.
+     * @return The missing number in the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int missingNumber(vector<int> &nums)
+    {
+        int n = nums.size();
+        int nSum = n * (n + 1) / 2, sum = 0;
+        for (int it : nums)
+            sum += it;
+
+        return nSum - sum;
+    }
+
+    /*
+     * @brief Finds the union of two sorted arrays and returns it as a new array.
+     * @param nums1 The first sorted array of integers.
+     * @param nums2 The second sorted array of integers.
+     * @return A new array containing the union of the two input arrays.
+     * @time_complexity: O(n + m), where n and m are the sizes of the two input arrays.
+     * @space_complexity: O(n + m) for the result array.
+     */
+    vector<int> unionArray(vector<int> &nums1, vector<int> &nums2)
+    {
+        vector<int> res;
+        int i = 0, j = 0, n1 = nums1.size(), n2 = nums2.size();
+
+        while (i < n1 && j < n2)
+        {
+            int curr;
+            if (nums1[i] < nums2[j])
+            {
+                curr = nums1[i];
+                i++;
+            }
+            else if (nums1[i] > nums2[j])
+            {
+                curr = nums2[j];
+                j++;
+            }
+            else
+            {
+                curr = nums1[i];
+                j++;
+                i++;
+            }
+
+            if (res.empty() || res.back() != curr)
+                res.push_back(curr);
+        }
+
+        while (i < n1)
+        {
+            if (res.empty() || res.back() != nums1[i])
+                res.push_back(nums1[i]);
+            i++;
+        }
+
+        while (j < n2)
+        {
+            if (res.empty() || res.back() != nums2[j])
+                res.push_back(nums2[j]);
+            j++;
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Finds the intersection of two sorted arrays and returns it as a new array.
+     * @param nums1 The first sorted array of integers.
+     * @param nums2 The second sorted array of integers.
+     * @return A new array containing the intersection of the two input arrays.
+     * @time_complexity: O(n + m), where n and m are the sizes of the two input arrays.
+     * @space_complexity: O(min(n, m)) for the result array.
+     */
+    vector<int> intersectionArray(vector<int> &nums1, vector<int> &nums2)
+    {
+        vector<int> res;
+        int i = 0, j = 0, n1 = nums1.size(), n2 = nums2.size();
+
+        while (i < n1 && j < n2)
+        {
+            if (nums1[i] < nums2[j])
+                i++;
+            else if (nums1[i] > nums2[j])
+                j++;
+            else
+            {
+                res.push_back(nums1[i]);
+                i++;
+                j++;
+            }
+        }
+
+        return res;
+    }
 };
 
 #endif
