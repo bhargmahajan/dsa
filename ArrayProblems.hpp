@@ -350,6 +350,141 @@ public:
 
         return res;
     }
+
+    /*
+     * @brief Finds the majority element in an array (the element that appears more than n/2 times).
+     * @param nums The array of integers.
+     * @return The majority element in the array. If no majority element exists, returns -1.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int majorityElement(vector<int> &nums)
+    {
+        int res = 0, freq = 0;
+
+        for (int it : nums)
+        {
+            if (freq == 0)
+                res = it;
+
+            if (it == res)
+                freq++;
+            else
+                freq--;
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Finds all the leaders in an array (elements that are greater than all elements to their right).
+     * @param nums The array of integers.
+     * @return A vector containing all the leaders in the array.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(k), where k is the number of leaders found.
+     */
+    vector<int> leaders(vector<int> &nums)
+    {
+        int n = nums.size();
+        int leader = nums[n - 1];
+        vector<int> res;
+        res.push_back(leader);
+
+        for (int i = n - 2; i >= 0; i--)
+        {
+            if (nums[i] > leader)
+            {
+                leader = nums[i];
+                res.push_back(leader);
+            }
+        }
+
+        reverse(res.begin(), res.end());
+
+        return res;
+    }
+
+    /*
+     * @brief Rearranges an array such that positive and negative numbers are placed alternatively.
+     * @param nums The array of integers.
+     * @return A new array with positive and negative numbers arranged alternately.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(n) for the result array.
+     */
+    vector<int> rearrangeArray(vector<int> &nums)
+    {
+        int odd = 1, even = 0;
+        vector<int> res(nums.size(), 0);
+
+        for (int i = 0; i < nums.size(); i++)
+        {
+            if (nums[i] >= 0)
+            {
+                res[even] = nums[i];
+                even += 2;
+            }
+            else
+            {
+                res[odd] = nums[i];
+                odd += 2;
+            }
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Print matrix in spiral order.
+     * @param matrix The 2D vector representing the matrix.
+     * @return A vector containing the elements of the matrix in spiral order.
+     * @time_complexity: O(m * n), where m is the number of rows and n is the number of columns.
+     * @space_complexity: O(m * n) for the result array.
+     */
+    vector<int> spiralOrder(vector<vector<int>> &matrix)
+    {
+        int top = 0, bottom = matrix.size() - 1, left = 0,
+            right = matrix[0].size() - 1;
+        vector<int> res;
+
+        while (top <= bottom && left <= right)
+        {
+            for (int i = left; i <= right; i++)
+                res.push_back(matrix[top][i]);
+            top++;
+
+            for (int i = top; i <= bottom; i++)
+                res.push_back(matrix[i][right]);
+            right--;
+
+            if (top <= bottom)
+            {
+                for (int i = right; i >= left; i--)
+                    res.push_back(matrix[bottom][i]);
+                bottom--;
+            }
+
+            if (left <= right)
+            {
+                for (int i = bottom; i >= top; i--)
+                    res.push_back(matrix[i][left]);
+                left++;
+            }
+        }
+
+        return res;
+    }
+
+    int pascalTriangleI(int r, int c)
+    {
+        r--;
+        c--;
+        int res = 1;
+
+        for (int i = 0; i < c; i++)
+            res = (res * (r - i)) / (i + 1);
+
+        return res;
+    }
 };
 
 #endif
