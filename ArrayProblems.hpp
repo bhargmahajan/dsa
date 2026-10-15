@@ -474,6 +474,14 @@ public:
         return res;
     }
 
+    /*
+     * @brief Calculates the value at a specific position in Pascal's Triangle.
+     * @param r The row number (1-indexed).
+     * @param c The column number (1-indexed).
+     * @return The value at the specified position in Pascal's Triangle.
+     * @time_complexity: O(c), where c is the column number.
+     * @space_complexity: O(1)
+     */
     int pascalTriangleI(int r, int c)
     {
         r--;
@@ -484,6 +492,82 @@ public:
             res = (res * (r - i)) / (i + 1);
 
         return res;
+    }
+
+    /*
+     * @brief Rotates a square matrix by 90 degrees clockwise in place.
+     * @param matrix The 2D vector representing the square matrix.
+     * @time_complexity: O(n^2), where n is the number of rows (or columns) in the matrix.
+     * @space_complexity: O(1)
+     */
+    void rotateMatrix(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size();
+        for (int i = 0; i < n; i++)
+        {
+            for (int j = i + 1; j < n; j++)
+                swap(matrix[i][j], matrix[j][i]);
+        }
+
+        for (int i = 0; i < n; i++)
+            reverse(matrix[i].begin(), matrix[i].end());
+    }
+
+    /*
+     * @brief Sets entire row and column to zero if an element in the matrix is zero.
+     * @param matrix The 2D vector representing the matrix.
+     * @time_complexity: O(m * n), where m is the number of rows and n is the number of columns.
+     * @space_complexity: O(1)
+     */
+    void setZeroes(vector<vector<int>> &matrix)
+    {
+        int n = matrix.size(), m = matrix[0].size();
+        bool rowZero = false, colZero = false;
+
+        for (int i = 0; i < m; i++)
+        {
+            if (matrix[0][i] == 0)
+                rowZero = true;
+        }
+
+        for (int i = 0; i < n; i++)
+        {
+            if (matrix[i][0] == 0)
+                colZero = true;
+        }
+
+        for (int i = 1; i < n; i++)
+        {
+            for (int j = 1; j < m; j++)
+            {
+                if (matrix[i][j] == 0)
+                {
+                    matrix[0][j] = 0;
+                    matrix[i][0] = 0;
+                }
+            }
+        }
+
+        for (int i = 1; i < n; i++)
+        {
+            for (int j = 1; j < m; j++)
+            {
+                if (matrix[0][j] == 0 || matrix[i][0] == 0)
+                    matrix[i][j] = 0;
+            }
+        }
+
+        if (rowZero)
+        {
+            for (int i = 0; i < m; i++)
+                matrix[0][i] = 0;
+        }
+
+        if (colZero)
+        {
+            for (int i = 0; i < n; i++)
+                matrix[i][0] = 0;
+        }
     }
 };
 
