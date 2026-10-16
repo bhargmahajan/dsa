@@ -495,6 +495,153 @@ public:
     }
 
     /*
+     * @brief Finds two indices in an array such that the elements at those indices add up to a specific target.
+     * @param nums The array of integers.
+     * @param target The target sum.
+     * @return A vector containing the two indices. If no such indices exist, returns {-1, -1}.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(n) for the hash map.
+     */
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> mp;
+
+        for (int i = 0; i < nums.size(); i++) {
+            int temp = target - nums[i];
+
+            if (mp.find(temp) != mp.end()) return {mp[temp], i};
+
+            mp[nums[i]] = i;
+        }
+
+        return {-1, -1};
+    }
+
+    /*
+     * @brief Finds all unique triplets in an array that sum up to zero.
+     * @param nums The array of integers.
+     * @return A vector of vectors containing all unique triplets that sum up to zero.
+     * @time_complexity: O(n^2), where n is the number of elements in the array.
+     * @space_complexity: O(1) for the result array (not counting the space used for the output).
+     */
+    vector<vector<int>> threeSum(vector<int> &nums)
+    {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        vector<vector<int>> res;
+
+        for (int i = 0; i < n - 2; i++)
+        {
+            if (i > 0 && nums[i] == nums[i - 1])
+                continue;
+
+            int left = i + 1, right = n - 1;
+            while (left < right)
+            {
+                int sum = nums[i] + nums[left] + nums[right];
+
+                if (sum < 0)
+                    left++;
+                else if (sum > 0)
+                    right--;
+                else
+                {
+                    res.push_back({nums[i], nums[left], nums[right]});
+                    left++;
+                    right--;
+
+                    while (left < right && nums[left] == nums[left - 1])
+                        left++;
+
+                    while (left < right && nums[right] == nums[right + 1])
+                        right--;
+                }
+            }
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Finds all unique quadruplets in an array that sum up to a specific target.
+     * @param nums The array of integers.
+     * @param target The target sum.
+     * @return A vector of vectors containing all unique quadruplets that sum up to the target.
+     * @time_complexity: O(n^3), where n is the number of elements in the array.
+     * @space_complexity: O(1) for the result array (not counting the space used for the output).
+     */
+    vector<vector<int>> fourSum(vector<int> &nums, int target)
+    {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        vector<vector<int>> res;
+
+        for (int k = 0; k < n - 3; k++)
+        {
+            if (k > 0 && nums[k] == nums[k - 1])
+                continue;
+
+            for (int i = k + 1; i < n - 2; i++)
+            {
+                if (i > k + 1 && nums[i] == nums[i - 1])
+                    continue;
+
+                int left = i + 1, right = n - 1;
+                while (left < right)
+                {
+                    int sum = nums[k] + nums[i] + nums[left] + nums[right];
+
+                    if (sum < target)
+                        left++;
+                    else if (sum > target)
+                        right--;
+                    else
+                    {
+                        res.push_back({nums[k], nums[i], nums[left], nums[right]});
+                        left++;
+                        right--;
+
+                        while (left < right && nums[left] == nums[left - 1])
+                            left++;
+
+                        while (left < right && nums[right] == nums[right + 1])
+                            right--;
+                    }
+                }
+            }
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Sorts an array containing only 0's, 1's, and 2's in place.
+     * @param nums The array of integers containing only 0's, 1's, and 2's.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void sortZeroOneTwo(vector<int> &nums)
+    {
+        int left = 0, i = 0, right = nums.size() - 1;
+
+        while (i <= right)
+        {
+            if (nums[i] == 0)
+            {
+                swap(nums[left], nums[i]);
+                i++;
+                left++;
+            }
+            else if (nums[i] == 1)
+                i++;
+            else
+            {
+                swap(nums[i], nums[right]);
+                right--;
+            }
+        }
+    }
+
+    /*
      * @brief Rotates a square matrix by 90 degrees clockwise in place.
      * @param matrix The 2D vector representing the square matrix.
      * @time_complexity: O(n^2), where n is the number of rows (or columns) in the matrix.
