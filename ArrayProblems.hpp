@@ -642,6 +642,107 @@ public:
     }
 
     /*
+     * @brief Finds the contiguous subarray with the largest sum in an array.
+     * @param nums The array of integers.
+     * @return The largest sum of any contiguous subarray.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    int maxSubArray(vector<int> &nums)
+    {
+        int res = nums[0], sum = nums[0];
+
+        for (int i = 1; i < nums.size(); i++)
+        {
+            sum = max(nums[i], sum + nums[i]);
+            res = max(res, sum);
+        }
+
+        return res;
+    }
+
+    /*
+     * @brief Rearranges an array into its next lexicographical permutation.
+     * @param nums The array of integers.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    void nextPermutation(vector<int> &nums)
+    {
+        int n = nums.size();
+        int pivot = n - 2;
+
+        while (pivot >= 0 && nums[pivot] >= nums[pivot + 1])
+            pivot--;
+
+        if (pivot < 0)
+        {
+            reverse(nums.begin(), nums.end());
+            return;
+        }
+
+        int i = n - 1;
+        while (nums[i] <= nums[pivot])
+            i--;
+
+        swap(nums[pivot], nums[i]);
+        reverse(nums.begin() + pivot + 1, nums.end());
+    }
+
+    /*
+     * @brief Finds all elements in an array that appear more than n/3 times.
+     * @param nums The array of integers.
+     * @return A vector containing all elements that appear more than n/3 times.
+     * @time_complexity: O(n), where n is the number of elements in the array.
+     * @space_complexity: O(1)
+     */
+    vector<int> majorityElementTwo(vector<int> &nums)
+    {
+        int el1 = nums[0], el2 = nums[0], cnt1 = 0, cnt2 = 0;
+
+        for (int it : nums)
+        {
+            if (el1 == it)
+                cnt1++;
+            else if (el2 == it)
+                cnt2++;
+            else if (cnt1 == 0)
+            {
+                el1 = it;
+                cnt1 = 1;
+            }
+            else if (cnt2 == 0)
+            {
+                el2 = it;
+                cnt2 = 1;
+            }
+            else
+            {
+                cnt1--;
+                cnt2--;
+            }
+        }
+
+        int verify1 = 0, verify2 = 0;
+        for (int it : nums)
+        {
+            if (it == el1)
+                verify1++;
+            else if (it == el2)
+                verify2++;
+        }
+
+        int thresh = nums.size() / 3;
+        vector<int> res;
+        if (verify1 > thresh)
+            res.push_back(el1);
+        if (el1 != el2 && verify2 > thresh)
+            res.push_back(el2);
+
+        return res;
+    }
+
+    /*
      * @brief Rotates a square matrix by 90 degrees clockwise in place.
      * @param matrix The 2D vector representing the square matrix.
      * @time_complexity: O(n^2), where n is the number of rows (or columns) in the matrix.
